@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class XMLNodeInfo {
     public static final short HAS_CHILDREN = 0;
-    public static final short HAS_VALUE = 0;
+    public static final short HAS_VALUE = 1;
     private Object data;
     private short nodeType;
 

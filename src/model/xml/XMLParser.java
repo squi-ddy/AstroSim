@@ -33,7 +33,6 @@ public class XMLParser {
             dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document XMLFile = db.parse(new File(this.filepath.toString()));
-            XMLFile.getDocumentElement().normalize();
             this.contentCache = recursiveReader(XMLFile.getDocumentElement());
         } catch (ParserConfigurationException | SAXException e) {
             throw new XMLParseException(XMLParseException.XML_ERROR);
@@ -70,12 +69,16 @@ public class XMLParser {
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document document = db.newDocument();
 
-            writer(document, new XMLNodeInfo(contentCache));
+            Node root = document.createElement("astrosim");
+            document.appendChild(root);
+            writer(root, new XMLNodeInfo(contentCache), document);
 
             TransformerFactory tFactory =
                     TransformerFactory.newInstance();
             Transformer transformer =
                     tFactory.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
             DOMSource source = new DOMSource(document);
             StreamResult result = new StreamResult(new File(filepath.toString()));
@@ -86,25 +89,29 @@ public class XMLParser {
     }
 
     @SuppressWarnings("unchecked")
-    private void writer(Node node, XMLNodeInfo nodeStuff) {
-        if (nodeStuff.getNodeType() == XMLNodeInfo.HAS_VALUE) node.setNodeValue((String) nodeStuff.getData());
+    private void writer(Node node, XMLNodeInfo nodeStuff, Document document) {
+        if (nodeStuff.getNodeType() == XMLNodeInfo.HAS_VALUE) {
+            node.appendChild(document.createTextNode((String) nodeStuff.getData()));
+            return;
+        }
         HashMap<String, XMLNodeInfo> children = (HashMap<String, XMLNodeInfo>) nodeStuff.getData();
         for (String child : children.keySet()) {
-            Node childNode = node.getOwnerDocument().createElement(child);
-            writer(childNode, children.get(child));
+            Node childNode = document.createElement(child);
+            writer(childNode, children.get(child), document);
             node.appendChild(childNode);
         }
     }
 
     private HashMap<String, XMLNodeInfo> recursiveReader(Node node) {
         HashMap<String, XMLNodeInfo> nodes = new HashMap<>();
-        NodeList children = (NodeList) node;
+        NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
-            if (n.hasChildNodes()) {
+            if (n.getNodeType() == Node.TEXT_NODE) continue;
+            if (n.hasChildNodes() && (n.getChildNodes().item(0).getNodeType() != Node.TEXT_NODE || n.getChildNodes().item(0).getNodeType() == Node.TEXT_NODE && n.getChildNodes().item(0).getNodeValue().trim().equals(""))) {
                 nodes.put(n.getNodeName(), new XMLNodeInfo(recursiveReader(n)));
             } else {
-                nodes.put(n.getNodeName(), new XMLNodeInfo(n.getNodeValue()));
+                nodes.put(n.getNodeName(), new XMLNodeInfo(n.getChildNodes().item(0).getNodeValue()));
             }
         }
         return nodes;

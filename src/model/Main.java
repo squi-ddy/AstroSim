@@ -10,10 +10,18 @@ public class Main extends Application {
     public static Settings globalSettings;
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
+        setGlobalSettings();
+        System.out.println(globalSettings.getSpeed());
+        System.out.println(globalSettings.getAccuracy());
+        System.out.println(globalSettings.getLastSave());
+    }
+
+    private void setGlobalSettings() {
         for (int i = 1; i <= MAX_RETRY; i++){
             try {
                 globalSettings = new Settings();
+                return;
             } catch (XMLParseException e) {
                 System.out.println("[WARN] Attempt to open global settings failed (" + i + "/" + MAX_RETRY + ")");
             }
@@ -22,7 +30,6 @@ public class Main extends Application {
             globalSettings = new Settings(false);
         } catch (XMLParseException e) {
             // something has gone terribly wrong
-            return;
         }
     }
 

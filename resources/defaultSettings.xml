@@ -3,5 +3,6 @@
   <settings>
     <accuracy>5</accuracy>
     <lastSave>null</lastSave>
+    <speed>1</speed>
   </settings>
 </astrosim>

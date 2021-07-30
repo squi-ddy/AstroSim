@@ -53,13 +53,12 @@ public class XMLParser {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
     public void writeContent(String[] path, XMLNodeInfo info) throws XMLParseException {
         // Writes to cache, not file (fast)
         // File only written upon save()
         XMLNodeInfo parent = getNodeByPath(Arrays.copyOf(path, path.length - 1));
         if (parent == null || parent.getNodeType() != XMLNodeInfo.HAS_CHILDREN) throw new XMLParseException(XMLParseException.TAG_NOT_FOUND);
-        HashMap<String, XMLNodeInfo> oldInfo = (HashMap<String, XMLNodeInfo>) parent.getData();
+        HashMap<String, XMLNodeInfo> oldInfo = parent.getDataTable();
         oldInfo.put(path[path.length - 1], info);
     }
 
@@ -88,17 +87,21 @@ public class XMLParser {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void writer(Node node, XMLNodeInfo nodeStuff, Document document) {
-        if (nodeStuff.getNodeType() == XMLNodeInfo.HAS_VALUE) {
-            node.appendChild(document.createTextNode((String) nodeStuff.getData()));
-            return;
-        }
-        HashMap<String, XMLNodeInfo> children = (HashMap<String, XMLNodeInfo>) nodeStuff.getData();
-        for (String child : children.keySet()) {
-            Node childNode = document.createElement(child);
-            writer(childNode, children.get(child), document);
-            node.appendChild(childNode);
+        try {
+            if (nodeStuff.getNodeType() == XMLNodeInfo.HAS_VALUE) {
+                node.appendChild(document.createTextNode(nodeStuff.getValue()));
+                return;
+            }
+            HashMap<String, XMLNodeInfo> children = nodeStuff.getDataTable();
+            for (String child : children.keySet()) {
+                Node childNode = document.createElement(child);
+                writer(childNode, children.get(child), document);
+                node.appendChild(childNode);
+            }
+        } catch (XMLParseException e) {
+            // ???
+            e.printStackTrace();
         }
     }
 
@@ -117,17 +120,17 @@ public class XMLParser {
         return nodes;
     }
 
-    // Java believes that the data cannot be casted to HashMap
-    // But the implementation says that it will always be HashMap if its type is HAS_CHILDREN
-    @SuppressWarnings("unchecked")
     private XMLNodeInfo getNodeByPath(String[] path) {
         HashMap<String, XMLNodeInfo> layer = contentCache;
         for (int i = 0; i < path.length - 1; i++) {
             String child = path[i];
             XMLNodeInfo childNode = layer.get(child);
             if (childNode == null) return null;
-            if (childNode.getNodeType() != XMLNodeInfo.HAS_CHILDREN) return null;
-            layer = (HashMap<String, XMLNodeInfo>) childNode.getData();
+            try {
+                layer = childNode.getDataTable();
+            } catch (XMLParseException e) {
+                return null;
+            }
         }
         return layer.get(path[path.length - 1]);
     }

@@ -1,8 +1,19 @@
 package model.math;
 
-public class Vector {
-    private final double x;
-    private final double y;
+import model.xml.XMLHashable;
+import model.xml.XMLNodeInfo;
+import model.xml.XMLParseException;
+
+import java.util.HashMap;
+
+public class Vector implements XMLHashable {
+    private double x;
+    private double y;
+
+    public Vector() {
+        this.x = 0;
+        this.y = 0;
+    }
 
     public Vector(double x, double y) {
         this.x = x;
@@ -43,5 +54,24 @@ public class Vector {
 
     public double getY() {
         return y;
+    }
+
+    @Override
+    public XMLNodeInfo hashed() {
+        HashMap<String, XMLNodeInfo> hashed = new HashMap<>();
+        hashed.put("x", new XMLNodeInfo(x));
+        hashed.put("y", new XMLNodeInfo(y));
+        return new XMLNodeInfo(hashed);
+    }
+
+    @Override
+    public void fromXML(XMLNodeInfo info) throws XMLParseException {
+        try {
+            HashMap<String, XMLNodeInfo> data = info.getDataTable();
+            x = Double.parseDouble(data.get("x").getValue());
+            y = Double.parseDouble(data.get("y").getValue());
+        } catch (XMLParseException | NullPointerException | NumberFormatException e) {
+            throw new XMLParseException(XMLParseException.XML_ERROR);
+        }
     }
 }

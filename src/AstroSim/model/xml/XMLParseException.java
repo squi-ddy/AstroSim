@@ -1,4 +1,4 @@
-package model.xml;
+package AstroSim.model.xml;
 
 public class XMLParseException extends Throwable {
     public static final short XML_ERROR = 0;

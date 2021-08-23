@@ -1,6 +1,6 @@
-package model.simulation;
+package AstroSim.model.simulation;
 
-import model.math.Vector;
+import AstroSim.model.math.Vector;
 
 import java.util.ArrayList;
 

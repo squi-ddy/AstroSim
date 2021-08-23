@@ -1,9 +1,9 @@
-package model;
+package AstroSim.model;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import model.simulation.Settings;
-import model.xml.XMLParseException;
+import AstroSim.model.simulation.Settings;
+import AstroSim.model.xml.XMLParseException;
 
 public class Main extends Application {
     public static final int MAX_RETRY = 10;

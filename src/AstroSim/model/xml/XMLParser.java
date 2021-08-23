@@ -1,4 +1,4 @@
-package model.xml;
+package AstroSim.model.xml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;

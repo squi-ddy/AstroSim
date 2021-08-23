@@ -1,8 +1,8 @@
-package model.simulation;
+package AstroSim.model.simulation;
 
-import model.xml.XMLNodeInfo;
-import model.xml.XMLParseException;
-import model.xml.XMLParser;
+import AstroSim.model.xml.XMLNodeInfo;
+import AstroSim.model.xml.XMLParseException;
+import AstroSim.model.xml.XMLParser;
 
 import java.io.IOException;
 import java.net.URISyntaxException;

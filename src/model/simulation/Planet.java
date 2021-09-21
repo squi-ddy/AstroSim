@@ -66,7 +66,7 @@ public class Planet implements XMLHashable {
         return velocity;
     }
 
-    public OrbitalPath path() {return path;}
+    public OrbitalPath getPath() {return path;}
 
     public boolean isStatic() {
         return isStatic;

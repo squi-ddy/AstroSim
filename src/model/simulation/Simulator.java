@@ -2,23 +2,17 @@ package model.simulation;
 
 import model.math.Vector;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public class Simulator implements Runnable {
-    private ArrayList<Planet> planets;
-    private final int planetIdx;
-    private Planet planet;
+    private final List<Planet> planets;
     private final double valG;
-    private final ArrayList<Vector> positions;
-    private double tStep;
+    private final double tStep;
     private int steps;
 
-    public Simulator(ArrayList<Planet> planets, int planetIdx, double valG, ArrayList<Vector> positions, double tStep, double simFor) {
-        this.planetIdx = planetIdx;
+    public Simulator(List<Planet> planets, double valG, double tStep, double simFor) {
         this.planets = planets;
-        this.planet = planets.get(planetIdx);
         this.valG = valG;
-        this.positions = positions;
         this.tStep = tStep;
         this.steps = (int) Math.round(simFor / tStep);
     }
@@ -26,12 +20,15 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         while (steps > 0) {
-            Vector accelG = new Vector();
-            for (Planet value : planets) {
-                accelG.add(accelG(value, planet));
+            for (Planet p1 : planets) {
+                Vector accelG = new Vector();
+                for (Planet p2 : planets) {
+                    accelG.add(accelG(p1, p2));
+                }
+                OrbitalPath positions = p1.getPath();
+                positions.add(positions.get(positions.size() - 1).add(planet.getVelocity().multiply(tStep)).add(accelG.multiply(0.5 * tStep * tStep)));
+                steps -= 1;
             }
-            positions.add(positions.get(positions.size() - 1).add(planet.getVelocity().multiply(tStep)).add(accelG.multiply(0.5 * tStep * tStep)));
-            steps -= 1;
         }
     }
 

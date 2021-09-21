@@ -6,7 +6,7 @@ public class XMLParseException extends Throwable {
     public static final short IO_EXCEPTION = 2;
     public static final short CANNOT_FIND_FILE = 3;
     public static final short WRONG_NODE_TYPE = 4;
-    private short type;
+    private final short type;
 
     public XMLParseException(short type) {
         this(type, "");

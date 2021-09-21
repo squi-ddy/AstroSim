@@ -1,5 +1,7 @@
 package model.simulation;
 
+import model.files.ResourceManager;
+import model.xml.XMLHashable;
 import model.xml.XMLNodeInfo;
 import model.xml.XMLParseException;
 import model.xml.XMLParser;
@@ -14,22 +16,73 @@ import java.util.HashMap;
 import java.util.Objects;
 
 public class Settings {
-    private static final Path filepath = Paths.get(System.getProperty("user.dir"), "settings.xml");
-    private XMLParser settingsXML;
-    private short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines distance step
-    private String lastSave = "null"; // file path to last save; provides smoothness
-    private short speed = 1; // The speed of the simulation
-    public boolean modifiable;
+    private static final Path filepath = Paths.get(System.getProperty("user.dir"), "data", "settings.xml");
+    private static XMLParser settingsXML;
+    private static short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines distance step
+    private static String lastSave = "null"; // file path to last save; provides smoothness
+    private static short speed = 1; // The speed of the simulation
 
     // Data class: stores settings from settings.xml (i.e. global settings)
-    // Constructor is designed to be run again and again until it works
-    public Settings(boolean modifiable) throws XMLParseException {
-        this.modifiable = modifiable;
-        if (!modifiable) return;
+
+    static {
         try {
-            HashMap<String, XMLNodeInfo> settings;
-            this.settingsXML = new XMLParser(filepath);
-            settings = this.settingsXML.getContent(new String[]{"settings"}).get("settings").getDataTable();
+            Settings.settingsXML = new XMLParser(filepath);
+            fromXML(Settings.settingsXML.getContent(new String[]{"settings"}).get("settings"));
+        } catch (XMLParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setAccuracy(short accuracy) {
+        Settings.accuracy = accuracy;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "accuracy"}, new XMLNodeInfo(accuracy));
+        } catch (XMLParseException e) {
+            // ???
+        }
+    }
+
+    public static void setSpeed(short speed) {
+        Settings.speed = speed;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "speed"}, new XMLNodeInfo(speed));
+        } catch (XMLParseException e) {
+            // ???
+        }
+    }
+
+    public static short getSpeed() {
+        return speed;
+    }
+
+    public static short getAccuracy() {
+        return accuracy;
+    }
+
+    public static String getLastSave() {
+        return lastSave.equals("null") ? null : lastSave;
+    }
+
+    public static void setLastSave(String lastSave) {
+        Settings.lastSave = lastSave;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "lastSave"}, new XMLNodeInfo(String.valueOf(lastSave)));
+        } catch (XMLParseException e) {
+            // ???
+        }
+    }
+
+    public static void saveSettings() throws XMLParseException {
+        settingsXML.saveXML();
+    }
+
+    private static void restoreDefaults() {
+        ResourceManager.restoreDefault(filepath);
+    }
+
+    private static void fromXML(XMLNodeInfo info) throws XMLParseException {
+        try {
+            var settings = info.getDataTable();
             XMLNodeInfo val = settings.get("accuracy");
             accuracy = Short.parseShort(val.getValue());
             val = settings.get("lastSave");
@@ -39,64 +92,6 @@ public class Settings {
         } catch (XMLParseException | NumberFormatException | ClassCastException | NullPointerException e) {
             restoreDefaults();
             throw new XMLParseException(XMLParseException.XML_ERROR);
-        }
-    }
-
-    public Settings() throws XMLParseException {
-        this(true);
-    }
-
-    public void setAccuracy(short accuracy) {
-        this.accuracy = accuracy;
-        try {
-            settingsXML.writeContent(new String[]{"settings", "accuracy"}, new XMLNodeInfo(accuracy));
-        } catch (XMLParseException e) {
-            // ???
-        }
-    }
-
-    public void setSpeed(short speed) {
-        this.speed = speed;
-        try {
-            settingsXML.writeContent(new String[]{"settings", "speed"}, new XMLNodeInfo(speed));
-        } catch (XMLParseException e) {
-            // ???
-        }
-    }
-
-    public short getSpeed() {
-        return speed;
-    }
-
-    public short getAccuracy() {
-        return accuracy;
-    }
-
-    public String getLastSave() {
-        return lastSave.equals("null") ? null : lastSave;
-    }
-
-    public void setLastSave(String lastSave) {
-        this.lastSave = lastSave;
-        try {
-            settingsXML.writeContent(new String[]{"settings", "lastSave"}, new XMLNodeInfo(String.valueOf(lastSave)));
-        } catch (XMLParseException e) {
-            // ???
-        }
-    }
-
-    public void saveSettings() throws XMLParseException {
-        settingsXML.saveXML();
-    }
-
-    private void restoreDefaults() {
-        // Probably some sort of corruption; reset to default
-        try {
-            Files.copy(Paths.get(Objects.requireNonNull(getClass().getResource("/defaultSettings.xml")).toURI()), filepath, StandardCopyOption.REPLACE_EXISTING);
-        } catch (URISyntaxException | IOException e2) {
-            // Settings cannot be loaded nor saved if this occurs
-            // Warn in console
-            System.out.println("Could not restore defaults.");
         }
     }
 }

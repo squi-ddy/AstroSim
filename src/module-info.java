@@ -1,9 +1,9 @@
 module AstroSim {
-    opens controller;
-    opens view;
-    opens model;
-    opens model.xml;
-    opens model.simulation;
+    opens AstroSim.controller;
+    opens AstroSim.view;
+    opens AstroSim.model;
+    opens AstroSim.model.xml;
+    opens AstroSim.model.simulation;
     requires javafx.base;
     requires javafx.controls;
     requires java.xml;

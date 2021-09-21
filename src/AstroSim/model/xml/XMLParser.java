@@ -1,4 +1,4 @@
-package model.xml;
+package AstroSim.model.xml;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import AstroSim.model.files.ResourceManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -25,7 +26,7 @@ public class XMLParser {
 
     public XMLParser(Path filepath) throws XMLParseException {
         if (!Files.exists(filepath)) {
-            throw new XMLParseException(XMLParseException.CANNOT_FIND_FILE);
+            ResourceManager.guaranteeExists(filepath);
         }
         this.filepath = filepath.toAbsolutePath();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

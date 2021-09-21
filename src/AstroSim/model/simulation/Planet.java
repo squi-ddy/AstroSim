@@ -1,9 +1,9 @@
-package model.simulation;
+package AstroSim.model.simulation;
 
-import model.math.Vector;
-import model.xml.XMLHashable;
-import model.xml.XMLNodeInfo;
-import model.xml.XMLParseException;
+import AstroSim.model.math.Vector;
+import AstroSim.model.xml.XMLHashable;
+import AstroSim.model.xml.XMLNodeInfo;
+import AstroSim.model.xml.XMLParseException;
 
 import java.util.HashMap;
 
@@ -66,7 +66,7 @@ public class Planet implements XMLHashable {
         return velocity;
     }
 
-    public OrbitalPath path() {return path;}
+    public OrbitalPath getPath() {return path;}
 
     public boolean isStatic() {
         return isStatic;

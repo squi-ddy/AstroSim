@@ -1,18 +1,19 @@
-package model.simulation;
+package AstroSim.model.simulation;
 
-import model.xml.XMLHashable;
-import model.xml.XMLNodeInfo;
-import model.xml.XMLParseException;
+import AstroSim.model.xml.XMLHashable;
+import AstroSim.model.xml.XMLNodeInfo;
+import AstroSim.model.xml.XMLParseException;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Scenario implements XMLHashable {
     // Loads the simulation field.
     // To be implemented
     private double valG;
     private Path filepath;
-    private ArrayList<Planet> planets;
+    private List<Planet> planets;
 
     public Scenario() {
         valG = 6.67e-11;

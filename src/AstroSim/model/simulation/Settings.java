@@ -1,12 +1,19 @@
 package AstroSim.model.simulation;
 
 import AstroSim.model.files.ResourceManager;
+import AstroSim.model.xml.XMLHashable;
 import AstroSim.model.xml.XMLNodeInfo;
 import AstroSim.model.xml.XMLParseException;
 import AstroSim.model.xml.XMLParser;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Objects;
 
 public class Settings {
     private static final Path filepath = Paths.get(System.getProperty("user.dir"), "data", "settings.xml");

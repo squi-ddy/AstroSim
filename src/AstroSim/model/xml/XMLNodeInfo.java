@@ -1,4 +1,4 @@
-package model.xml;
+package AstroSim.model.xml;
 
 import java.util.HashMap;
 

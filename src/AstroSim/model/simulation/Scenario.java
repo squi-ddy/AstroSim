@@ -1,8 +1,8 @@
-package model.simulation;
+package AstroSim.model.simulation;
 
-import model.xml.XMLHashable;
-import model.xml.XMLNodeInfo;
-import model.xml.XMLParseException;
+import AstroSim.model.xml.XMLHashable;
+import AstroSim.model.xml.XMLNodeInfo;
+import AstroSim.model.xml.XMLParseException;
 
 import java.nio.file.Path;
 import java.util.List;

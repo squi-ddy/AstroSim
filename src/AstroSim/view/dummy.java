@@ -1,4 +1,4 @@
-package controller;
+package AstroSim.view;
 
 public class dummy {
 }

@@ -2,17 +2,23 @@ package AstroSim.model.simulation;
 
 import AstroSim.model.math.Vector;
 
-import java.util.List;
+import java.util.ArrayList;
 
 public class Simulator implements Runnable {
-    private final List<Planet> planets;
+    private ArrayList<Planet> planets;
+    private final int planetIdx;
+    private Planet planet;
     private final double valG;
-    private final double tStep;
+    private final ArrayList<Vector> positions;
+    private double tStep;
     private int steps;
 
-    public Simulator(List<Planet> planets, double valG, double tStep, double simFor) {
+    public Simulator(ArrayList<Planet> planets, int planetIdx, double valG, ArrayList<Vector> positions, double tStep, double simFor) {
+        this.planetIdx = planetIdx;
         this.planets = planets;
+        this.planet = planets.get(planetIdx);
         this.valG = valG;
+        this.positions = positions;
         this.tStep = tStep;
         this.steps = (int) Math.round(simFor / tStep);
     }
@@ -20,15 +26,12 @@ public class Simulator implements Runnable {
     @Override
     public void run() {
         while (steps > 0) {
-            for (Planet p1 : planets) {
-                Vector accelG = new Vector();
-                for (Planet p2 : planets) {
-                    accelG.add(accelG(p1, p2));
-                }
-                OrbitalPath positions = p1.getPath();
-                positions.add(positions.get(positions.size() - 1).add(planet.getVelocity().multiply(tStep)).add(accelG.multiply(0.5 * tStep * tStep)));
-                steps -= 1;
+            Vector accelG = new Vector();
+            for (Planet value : planets) {
+                accelG.add(accelG(value, planet));
             }
+            positions.add(positions.get(positions.size() - 1).add(planet.getVelocity().multiply(tStep)).add(accelG.multiply(0.5 * tStep * tStep)));
+            steps -= 1;
         }
     }
 

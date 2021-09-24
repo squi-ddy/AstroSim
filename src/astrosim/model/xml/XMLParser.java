@@ -1,12 +1,5 @@
-package AstroSim.model.xml;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.HashMap;
+package astrosim.model.xml;
 
-import AstroSim.model.files.ResourceManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -16,25 +9,33 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.*;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class XMLParser {
     private final Path filepath;
-    private final HashMap<String, XMLNodeInfo> contentCache;
+    private final Map<String, XMLNodeInfo> contentCache;
 
     public XMLParser(Path filepath) throws XMLParseException {
-        if (!Files.exists(filepath)) {
-            ResourceManager.guaranteeExists(filepath);
-        }
         this.filepath = filepath.toAbsolutePath();
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
             DocumentBuilder db = dbf.newDocumentBuilder();
-            Document XMLFile = db.parse(new File(this.filepath.toString()));
-            this.contentCache = recursiveReader(XMLFile.getDocumentElement());
+            Document xmlFile = db.parse(new File(this.filepath.toString()));
+            this.contentCache = recursiveReader(xmlFile.getDocumentElement());
         } catch (ParserConfigurationException | SAXException e) {
             throw new XMLParseException(XMLParseException.XML_ERROR);
         } catch (IOException e) {
@@ -42,11 +43,11 @@ public class XMLParser {
         }
     }
 
-    public HashMap<String, XMLNodeInfo> getContent() {
+    public Map<String, XMLNodeInfo> getContent() {
         return contentCache;
     }
 
-    public HashMap<String, XMLNodeInfo> getContent(String[] path) throws XMLParseException {
+    public Map<String, XMLNodeInfo> getContent(String[] path) throws XMLParseException {
         HashMap<String, XMLNodeInfo> result = new HashMap<>();
         XMLNodeInfo node = getNodeByPath(path);
         if (node == null) throw new XMLParseException(XMLParseException.TAG_NOT_FOUND);
@@ -59,7 +60,7 @@ public class XMLParser {
         // File only written upon save()
         XMLNodeInfo parent = getNodeByPath(Arrays.copyOf(path, path.length - 1));
         if (parent == null || parent.getNodeType() != XMLNodeInfo.HAS_CHILDREN) throw new XMLParseException(XMLParseException.TAG_NOT_FOUND);
-        HashMap<String, XMLNodeInfo> oldInfo = parent.getDataTable();
+        Map<String, XMLNodeInfo> oldInfo = parent.getDataTable();
         oldInfo.put(path[path.length - 1], info);
     }
 
@@ -73,10 +74,11 @@ public class XMLParser {
             document.appendChild(root);
             writer(root, new XMLNodeInfo(contentCache), document);
 
-            TransformerFactory tFactory =
-                    TransformerFactory.newInstance();
-            Transformer transformer =
-                    tFactory.newTransformer();
+            TransformerFactory tFactory = TransformerFactory.newInstance();
+            tFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            tFactory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+
+            Transformer transformer = tFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
 
@@ -94,10 +96,10 @@ public class XMLParser {
                 node.appendChild(document.createTextNode(nodeStuff.getValue()));
                 return;
             }
-            HashMap<String, XMLNodeInfo> children = nodeStuff.getDataTable();
-            for (String child : children.keySet()) {
-                Node childNode = document.createElement(child);
-                writer(childNode, children.get(child), document);
+            Map<String, XMLNodeInfo> children = nodeStuff.getDataTable();
+            for (var child : children.entrySet()) {
+                Node childNode = document.createElement(child.getKey());
+                writer(childNode, child.getValue(), document);
                 node.appendChild(childNode);
             }
         } catch (XMLParseException e) {
@@ -106,8 +108,8 @@ public class XMLParser {
         }
     }
 
-    private HashMap<String, XMLNodeInfo> recursiveReader(Node node) {
-        HashMap<String, XMLNodeInfo> nodes = new HashMap<>();
+    private Map<String, XMLNodeInfo> recursiveReader(Node node) {
+        Map<String, XMLNodeInfo> nodes = new HashMap<>();
         NodeList children = node.getChildNodes();
         for (int i = 0; i < children.getLength(); i++) {
             Node n = children.item(i);
@@ -122,7 +124,7 @@ public class XMLParser {
     }
 
     private XMLNodeInfo getNodeByPath(String[] path) {
-        HashMap<String, XMLNodeInfo> layer = contentCache;
+        Map<String, XMLNodeInfo> layer = contentCache;
         for (int i = 0; i < path.length - 1; i++) {
             String child = path[i];
             XMLNodeInfo childNode = layer.get(child);
@@ -133,6 +135,6 @@ public class XMLParser {
                 return null;
             }
         }
-        return layer.get(path[path.length - 1]);
+        return (path.length > 0) ? layer.get(path[path.length - 1]) : new XMLNodeInfo(contentCache);
     }
 }

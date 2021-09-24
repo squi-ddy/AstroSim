@@ -1,1 +1,1 @@
-# AstroSim
+# astrosim

@@ -1,26 +1,21 @@
-package AstroSim.model.simulation;
+package AstroSim.model.files;
 
-import AstroSim.model.files.ResourceManager;
-import AstroSim.model.xml.XMLHashable;
 import AstroSim.model.xml.XMLNodeInfo;
 import AstroSim.model.xml.XMLParseException;
 import AstroSim.model.xml.XMLParser;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
-import java.util.HashMap;
-import java.util.Objects;
 
 public class Settings {
     private static final Path filepath = Paths.get(System.getProperty("user.dir"), "data", "settings.xml");
     private static XMLParser settingsXML;
-    private static short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines distance step
+    private static short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines time step
     private static String lastSave = "null"; // file path to last save; provides smoothness
     private static short speed = 1; // The speed of the simulation
+    private static int burstAmount = 50; // The amount of steps to calculate at a time
+    private static int maxPointsInTrail = 150;
+    private static int maxBufferInTrail = 150;
 
     // Data class: stores settings from settings.xml (i.e. global settings)
 
@@ -30,6 +25,41 @@ public class Settings {
             fromXML(Settings.settingsXML.getContent(new String[]{"settings"}).get("settings"));
         } catch (XMLParseException e) {
             e.printStackTrace();
+        }
+    }
+
+    public static void setMaxBufferInTrail(int maxBufferInTrail) {
+        Settings.maxBufferInTrail = maxBufferInTrail;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "bufferLen"}, new XMLNodeInfo(maxBufferInTrail));
+        } catch (XMLParseException e) {
+            // ???
+        }
+    }
+
+    public static void setMaxPointsInTrail(int maxPointsInTrail) {
+        Settings.maxPointsInTrail = maxPointsInTrail;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "trailLen"}, new XMLNodeInfo(maxPointsInTrail));
+        } catch (XMLParseException e) {
+            // ???
+        }
+    }
+
+    public static int getMaxBufferInTrail() {
+        return maxBufferInTrail;
+    }
+
+    public static int getMaxPointsInTrail() {
+        return maxPointsInTrail;
+    }
+
+    public static void setBurstAmount(short burstAmount) {
+        Settings.burstAmount = burstAmount;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "burstAmount"}, new XMLNodeInfo(burstAmount));
+        } catch (XMLParseException e) {
+            // ???
         }
     }
 
@@ -63,6 +93,10 @@ public class Settings {
         return lastSave.equals("null") ? null : lastSave;
     }
 
+    public static int getBurstAmount() {
+        return burstAmount;
+    }
+
     public static void setLastSave(String lastSave) {
         Settings.lastSave = lastSave;
         try {
@@ -83,12 +117,12 @@ public class Settings {
     private static void fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
             var settings = info.getDataTable();
-            XMLNodeInfo val = settings.get("accuracy");
-            accuracy = Short.parseShort(val.getValue());
-            val = settings.get("lastSave");
-            lastSave = val.getValue();
-            val = settings.get("speed");
-            speed = Short.parseShort(val.getValue());
+            accuracy = Short.parseShort(settings.get("accuracy").getValue());
+            lastSave = settings.get("lastSave").getValue();
+            speed = Short.parseShort(settings.get("speed").getValue());
+            burstAmount = Integer.parseInt(settings.get("burstAmount").getValue());
+            maxBufferInTrail = Integer.parseInt(settings.get("bufferLen").getValue());
+            maxPointsInTrail = Integer.parseInt(settings.get("trailLen").getValue());
         } catch (XMLParseException | NumberFormatException | ClassCastException | NullPointerException e) {
             restoreDefaults();
             throw new XMLParseException(XMLParseException.XML_ERROR);

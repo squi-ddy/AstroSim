@@ -6,16 +6,14 @@ import AstroSim.model.xml.XMLHashable;
 import AstroSim.model.xml.XMLNodeInfo;
 import AstroSim.model.xml.XMLParseException;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class OrbitalPath implements XMLHashable {
     // Stores tracers.
-    private Deque<Vector> positionBuffer;
-    private Deque<Vector> velocityBuffer;
-    private Deque<Vector> positionTrail;
+    private final Deque<Vector> positionBuffer;
+    private final Deque<Vector> velocityBuffer;
+    private final Deque<Vector> positionTrail;
+    private final Deque<Vector> velocityTrail;
     private static int maxLength = 0;
     private static int maxBufferLength = 0;
 
@@ -27,18 +25,18 @@ public class OrbitalPath implements XMLHashable {
         OrbitalPath.maxBufferLength = maxBufferLength;
     }
 
-    public OrbitalPath(List<Vector> position, List<Vector> velocity, Vector initialPos, Vector initialVel) {
-        this.positionBuffer = new ArrayDeque<>(position);
-        this.velocityBuffer = new ArrayDeque<>(velocity);
-        positionBuffer.addFirst(initialPos);
-        velocityBuffer.addFirst(initialVel);
+    public OrbitalPath(Vector position, Vector velocity) {
+        this.positionTrail = new ArrayDeque<>(List.of(position));
+        this.velocityTrail = new ArrayDeque<>(List.of(velocity));
+        this.positionBuffer = new ArrayDeque<>();
+        this.velocityBuffer = new ArrayDeque<>();
     }
 
     public OrbitalPath() {
-        this(new ArrayList<>(), new ArrayList<>(), new Vector(), new Vector());
+        this(new Vector(), new Vector());
     }
 
-    public void addPoint(Vector pos, Vector vel) {
+    public void addPosition(Vector pos, Vector vel) {
         if (positionBuffer.size() < maxBufferLength) {
             positionBuffer.add(pos);
             velocityBuffer.add(vel);
@@ -50,20 +48,18 @@ public class OrbitalPath implements XMLHashable {
     }
 
     public void clearBuffer() {
-        Vector pos = positionBuffer.getFirst();
-        Vector vel = velocityBuffer.getFirst();
         positionBuffer.clear();
         velocityBuffer.clear();
-        positionBuffer.add(pos);
-        velocityBuffer.add(vel);
     }
 
     public Vector getLatestVelocity() {
-        return velocityBuffer.getLast();
+        if (velocityBuffer.size() > 0) return velocityBuffer.getLast();
+        return getVelocity();
     }
 
     public Vector getLatestPosition() {
-        return positionBuffer.getLast();
+        if (positionBuffer.size() > 0) return positionBuffer.getLast();
+        return getPosition();
     }
 
     public Polyline getTrail() {
@@ -77,13 +73,55 @@ public class OrbitalPath implements XMLHashable {
         return pl;
     }
 
-    @Override
-    public XMLNodeInfo hashed() {
-        return null;
+    public Vector getPosition() {
+        return positionTrail.getLast();
+    }
+
+    public Vector getVelocity() {
+        return velocityTrail.getLast();
+    }
+
+    public void clearTrail() {
+        velocityTrail.clear();
+        positionTrail.clear();
+    }
+
+    public void setPosition(Vector position, Vector velocity) {
+        positionTrail.clear();
+        positionBuffer.clear();
+        velocityTrail.clear();
+        velocityBuffer.clear();
+        positionTrail.add(position);
+        velocityTrail.add(velocity);
+    }
+
+    public void addToTrail() {
+        positionTrail.add(positionBuffer.getFirst());
+        velocityTrail.add(velocityBuffer.getFirst());
+        positionBuffer.removeFirst();
+        velocityBuffer.removeFirst();
+        if (positionTrail.size() > maxLength) {
+            positionTrail.removeFirst();
+            velocityTrail.removeFirst();
+        }
     }
 
     @Override
-    public void fromXML(XMLNodeInfo info) throws XMLParseException {
+    public XMLNodeInfo hashed() {
+        HashMap<String, XMLNodeInfo> hashed = new HashMap<>();
+        hashed.put("position", getPosition().hashed());
+        hashed.put("velocity", getVelocity().hashed());
+        return new XMLNodeInfo(hashed);
+    }
 
+    public static OrbitalPath fromXML(XMLNodeInfo info) throws XMLParseException {
+        try {
+            HashMap<String, XMLNodeInfo> hashed = info.getDataTable();
+            Vector position = Vector.fromXML(hashed.get("position"));
+            Vector velocity = Vector.fromXML(hashed.get("velocity"));
+            return new OrbitalPath(position, velocity);
+        } catch (XMLParseException | NullPointerException | NumberFormatException e) {
+            throw new XMLParseException(XMLParseException.XML_ERROR);
+        }
     }
 }

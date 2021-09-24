@@ -2,7 +2,7 @@ package AstroSim.model;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import AstroSim.model.simulation.Settings;
+import AstroSim.model.files.Settings;
 
 public class ModelTester extends Application {
 

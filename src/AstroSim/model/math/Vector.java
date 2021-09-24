@@ -7,8 +7,8 @@ import AstroSim.model.xml.XMLParseException;
 import java.util.HashMap;
 
 public class Vector implements XMLHashable {
-    private double x;
-    private double y;
+    private final double x;
+    private final double y;
 
     public Vector() {
         this.x = 0;
@@ -28,10 +28,6 @@ public class Vector implements XMLHashable {
         return new Vector(x - v2.x, y - v2.y);
     }
 
-    public Vector multiply(Vector v2) {
-        return new Vector(x * v2.x, y * v2.y);
-    }
-
     public Vector multiply(double c) {
         return new Vector(x * c, y * c);
     }
@@ -44,7 +40,7 @@ public class Vector implements XMLHashable {
         return Math.sqrt(x * x + y * y);
     }
 
-    public Vector normalised() {
+    public Vector normalise() {
         return new Vector(x / magnitude(), y / magnitude());
     }
 
@@ -64,12 +60,12 @@ public class Vector implements XMLHashable {
         return new XMLNodeInfo(hashed);
     }
 
-    @Override
-    public void fromXML(XMLNodeInfo info) throws XMLParseException {
+    public static Vector fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
             HashMap<String, XMLNodeInfo> data = info.getDataTable();
-            x = Double.parseDouble(data.get("x").getValue());
-            y = Double.parseDouble(data.get("y").getValue());
+            double x = Double.parseDouble(data.get("x").getValue());
+            double y = Double.parseDouble(data.get("y").getValue());
+            return new Vector(x, y);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.XML_ERROR);
         }

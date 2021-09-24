@@ -5,25 +5,25 @@ import AstroSim.model.xml.XMLHashable;
 import AstroSim.model.xml.XMLNodeInfo;
 import AstroSim.model.xml.XMLParseException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 
 public class Planet implements XMLHashable {
     // A Planet. Constructed by Scenario.
     private String name;
     private boolean isStatic;
-    private Vector velocity;
-    private Vector position;
     private double mass;
     private double radius;
-    private OrbitalPath path;
+    private final OrbitalPath path;
 
     public Planet(Vector position, double mass, double radius, Vector velocity, boolean isStatic, String name) {
-        this.position = position;
         this.mass = mass;
         this.radius = radius;
-        this.velocity = velocity;
         this.isStatic = isStatic;
         this.name = name;
+        this.path = new OrbitalPath(position, velocity);
     }
 
     public Planet(Vector position, double mass, double radius, Vector velocity, boolean isStatic) {
@@ -59,11 +59,11 @@ public class Planet implements XMLHashable {
     }
 
     public Vector getPosition() {
-        return position;
+        return path.getPosition();
     }
 
     public Vector getVelocity() {
-        return velocity;
+        return path.getVelocity();
     }
 
     public OrbitalPath getPath() {return path;}
@@ -76,8 +76,8 @@ public class Planet implements XMLHashable {
         this.mass = mass;
     }
 
-    public void setPosition(Vector position) {
-        this.position = position;
+    public void setPosition(Vector position, Vector velocity) {
+        path.setPosition(position, velocity);
     }
 
     public void setRadius(double radius) {
@@ -88,15 +88,9 @@ public class Planet implements XMLHashable {
         isStatic = aStatic;
     }
 
-    public void setVelocity(Vector velocity) {
-        this.velocity = velocity;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
-
-    public void setPath(OrbitalPath path) {this.path = path;}
 
     public String getName() {
         return name;
@@ -109,23 +103,19 @@ public class Planet implements XMLHashable {
         hashed.put("static", new XMLNodeInfo(isStatic));
         hashed.put("radius", new XMLNodeInfo(radius));
         hashed.put("name", new XMLNodeInfo(name));
-        hashed.put("position", position.hashed());
-        hashed.put("velocity", velocity.hashed());
+        hashed.put("path", path.hashed());
         return new XMLNodeInfo(hashed);
     }
 
-    @Override
-    public void fromXML(XMLNodeInfo info) throws XMLParseException {
+    public static Planet fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
             HashMap<String, XMLNodeInfo> data = info.getDataTable();
-            mass = Double.parseDouble(data.get("mass").getValue());
-            isStatic = Boolean.parseBoolean(data.get("static").getValue());
-            radius = Double.parseDouble(data.get("radius").getValue());
-            name = data.get("name").getValue();
-            position = new Vector();
-            position.fromXML(new XMLNodeInfo(data.get("position").getDataTable()));
-            velocity = new Vector();
-            velocity.fromXML(new XMLNodeInfo(data.get("velocity").getDataTable()));
+            double mass = Double.parseDouble(data.get("mass").getValue());
+            boolean isStatic = Boolean.parseBoolean(data.get("static").getValue());
+            double radius = Double.parseDouble(data.get("radius").getValue());
+            String name = data.get("name").getValue();
+            OrbitalPath path = OrbitalPath.fromXML(data.get("path"));
+            return new Planet(path.getPosition(), mass, radius, path.getVelocity(), isStatic, name);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.XML_ERROR);
         }

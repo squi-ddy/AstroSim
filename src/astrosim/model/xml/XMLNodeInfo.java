@@ -32,9 +32,4 @@ public class XMLNodeInfo {
         if (nodeType == HAS_CHILDREN) throw new XMLParseException(XMLParseException.WRONG_NODE_TYPE);
         return value; // Should be cast by anyone who uses this data
     }
-
-    public XMLNodeInfo getKey(String key) throws XMLParseException {
-        if (nodeType == HAS_VALUE) throw new XMLParseException(XMLParseException.WRONG_NODE_TYPE);
-        return dataTable.get(key);
-    }
 }

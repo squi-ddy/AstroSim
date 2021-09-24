@@ -1,6 +1,6 @@
-package AstroSim.model.xml;
+package astrosim.model.xml;
 
-public class XMLParseException extends Throwable {
+public class XMLParseException extends Exception {
     public static final short XML_ERROR = 0;
     public static final short TAG_NOT_FOUND = 1;
     public static final short IO_EXCEPTION = 2;

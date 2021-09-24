@@ -1,4 +1,4 @@
-package AstroSim.model.files;
+package astrosim.model.files;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -6,6 +6,8 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class ResourceManager {
+    private ResourceManager() {}
+
     private static final Path rootFP = Path.of(System.getProperty("user.dir"));
 
     public static FileInputStream readFile(Path fp) {
@@ -75,25 +77,20 @@ public class ResourceManager {
         return os;
     }
 
-    public static Path guaranteeExists(Path fp) {
+    public static Path guaranteeExists(Path fp, String defaultPath) {
         // guarantee the file exists, returning its fp
-        return guaranteeExists(rootFP.relativize(fp).toString());
+        return guaranteeExists(rootFP.relativize(fp).toString(), defaultPath);
     }
 
-    public static Path guaranteeExists(String fp) {
+    public static Path guaranteeExists(String fp, String defaultPath) {
         // guarantee the file exists, returning its fp
         Path filePath = rootFP.resolve(Path.of(fp));
         File file = new File(String.valueOf(filePath));
         if (!file.exists()) {
             try {
                 Files.createDirectories(filePath.getParent());
-                if (ResourceManager.class.getResource("/" + fp) == null) {
-                    // no default, simply create blank file
-                    Files.createFile(filePath);
-                } else {
-                    // copy default over
-                    Files.copy(Objects.requireNonNull(ResourceManager.class.getResourceAsStream("/" + fp)), filePath);
-                }
+                // copy default over
+                Files.copy(Objects.requireNonNull(ResourceManager.class.getResourceAsStream(defaultPath)), filePath);
             } catch (IOException e) {
                 e.printStackTrace();
             }

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<astrosim>
+  <settings>
+    <lastSave>/home/squiddy/IdeaProjects/AstroSim/save.xml</lastSave>
+    <trailLen>150</trailLen>
+    <accuracy>10</accuracy>
+    <speed>1</speed>
+    <bufferLen>150</bufferLen>
+  </settings>
+</astrosim>

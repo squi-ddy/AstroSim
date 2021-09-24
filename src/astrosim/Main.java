@@ -1,4 +1,4 @@
-package AstroSim;
+package astrosim;
 
 import javafx.application.Application;
 import javafx.stage.Stage;

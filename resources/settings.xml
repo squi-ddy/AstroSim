@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <astrosim>
-  <settings>
-    <dark>true</dark>
-    <accuracy>10</accuracy>
-    <lastSave>null</lastSave>
-    <speed>1</speed>
-    <bufferLen>150</bufferLen>
-    <trailLen>150</trailLen>
-  </settings>
+    <settings>
+        <dark>true</dark>
+        <accuracy>10</accuracy>
+        <lastSave>null</lastSave>
+        <speed>1</speed>
+        <bufferLen>150</bufferLen>
+        <trailLen>150</trailLen>
+    </settings>
 </astrosim>

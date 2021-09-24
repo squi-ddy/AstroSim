@@ -32,10 +32,6 @@ public class OrbitalPath implements XMLHashable {
         this.velocityBuffer = new ArrayDeque<>();
     }
 
-    public OrbitalPath() {
-        this(new Vector2D(), new Vector2D());
-    }
-
     public void addPosition(Vector2D pos, Vector2D vel) {
         if (positionBuffer.size() < maxBufferLength) {
             positionBuffer.add(pos);

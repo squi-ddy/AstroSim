@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<astrosim>
+    <scenario>
+        <name>One Planet</name>
+        <valG>6.67E-11</valG>
+        <planets>
+            <elem0>
+                <path>
+                    <position>
+                        <x>0.0</x>
+                        <y>0.0</y>
+                    </position>
+                    <velocity>
+                        <x>0.0</x>
+                        <y>0.0</y>
+                    </velocity>
+                </path>
+                <static>false</static>
+                <mass>1.0E20</mass>
+                <name>Planet</name>
+                <radius>1000000.0</radius>
+            </elem0>
+            <size>1</size>
+        </planets>
+        <valRes>1.0E10</valRes>
+    </scenario>
+</astrosim>

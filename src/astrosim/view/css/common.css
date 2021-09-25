@@ -1,0 +1,86 @@
+/*
+ScrollPane css stuff
+*/
+
+.scroll-pane > .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane {
+    -fx-background-color: -theme-color-3;
+    -fx-background-radius: 5;
+    -fx-border-color: -theme-color-2;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+}
+
+.scroll-pane > .scroll-bar {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane > .scroll-bar:vertical {
+    -fx-padding: 5 2 5 0;
+    -fx-scale-x: 0.9;
+}
+
+.scroll-pane > .scroll-bar > .decrement-button > .decrement-arrow,
+.scroll-pane > .scroll-bar > .increment-button > .increment-arrow
+{
+    -fx-scale-x: 0.85;
+    -fx-scale-y: 0.85;
+    -fx-background-color: -theme-color-2;
+}
+
+.scroll-pane > .scroll-bar:vertical {
+    -fx-padding: 5 2 5 0;
+    -fx-scale-x: 0.9;
+}
+
+.scroll-pane > .scroll-bar:horizontal {
+    -fx-padding: 0 5 2 5;
+    -fx-scale-y: 0.9;
+}
+
+.scroll-pane > .scroll-bar > .thumb {
+    -fx-background-color: -theme-color-2;
+}
+
+/*
+Stuff inside ScrollPanes
+*/
+.scroll-pane-elem {
+    -fx-background-color: -theme-color-1;
+    -fx-background-radius: 5;
+    -fx-border-color: -theme-color-2;
+    -fx-border-radius: 5;
+    -fx-padding: 5;
+}
+
+.scroll-pane-elem:hover {
+    -fx-background-color: derive(-theme-color-1, 10%);
+}
+
+/*
+A cool, theme-fitting button
+*/
+.themed-button > SVGPath {
+    -fx-stroke: -theme-text-color-2;
+    -fx-stroke-width: 2.5;
+    -fx-stroke-line-cap: round;
+}
+
+.themed-button:hover > SVGPath {
+    -fx-stroke: -theme-text-color-1;
+    -fx-stroke-width: 2.5;
+    -fx-stroke-line-cap: round;
+}
+
+.themed-button {
+    -fx-background-color: derive(-theme-color-1, 10%);
+    -fx-background-radius: 5;
+    -fx-padding: 8;
+}
+
+.themed-button:hover {
+    -fx-background-color: derive(-theme-color-1, 30%);
+}

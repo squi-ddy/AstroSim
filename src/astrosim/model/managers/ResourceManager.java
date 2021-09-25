@@ -1,9 +1,12 @@
-package astrosim.model.files;
+package astrosim.model.managers;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class ResourceManager {
     private ResourceManager() {}
@@ -41,9 +44,9 @@ public class ResourceManager {
         return is;
     }
 
-    public static FileInputStream restoreDefault(Path fp) {
+    public static void restoreDefault(Path fp) throws IOException {
         // guarantee the file exists, returning its fp
-        return readFile(rootFP.relativize(fp).toString());
+        restoreDefault(rootFP.relativize(fp).toString());
     }
 
     public static void restoreDefault(String fp) throws IOException {
@@ -77,9 +80,9 @@ public class ResourceManager {
         return os;
     }
 
-    public static Path guaranteeExists(Path fp, String defaultPath) {
+    public static void guaranteeExists(Path fp, String defaultPath) {
         // guarantee the file exists, returning its fp
-        return guaranteeExists(rootFP.relativize(fp).toString(), defaultPath);
+        guaranteeExists(rootFP.relativize(fp).toString(), defaultPath);
     }
 
     public static Path guaranteeExists(String fp, String defaultPath) {
@@ -100,5 +103,42 @@ public class ResourceManager {
 
     public static Path getPath(String append) {
         return rootFP.resolve(Path.of(append));
+    }
+
+    public static void copyFromResourceDirectory(String source, Path target) {
+        Stream<Path> toBeCopied = null;
+        try {
+            Path sourcePath = Path.of(Objects.requireNonNull(ResourceManager.class.getResource(source)).toURI());
+            toBeCopied = Files.list(sourcePath);
+            Files.createDirectories(target);
+            toBeCopied.forEach(p -> {
+                try {
+                    Files.copy(p, target.resolve(sourcePath.relativize(p)), StandardCopyOption.REPLACE_EXISTING);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+        } catch (IOException | URISyntaxException e) {
+            e.printStackTrace();
+        } finally {
+            if (toBeCopied != null) toBeCopied.close();
+        }
+    }
+
+    public static void copyFromResourceDirectory(String source, String target) {
+        copyFromResourceDirectory(source, rootFP.resolve(Path.of(target)));
+    }
+
+    public static Stream<Path> getFilesInDirectory(String directory) {
+        return getFilesInDirectory(rootFP.resolve(Path.of(directory)));
+    }
+
+    public static Stream<Path> getFilesInDirectory(Path dirPath) {
+        try {
+            return Files.list(dirPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -1,6 +1,6 @@
 package astrosim.model.simulation;
 
-import astrosim.model.files.Settings;
+import astrosim.model.managers.Settings;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLList;
 import astrosim.model.xml.XMLNodeInfo;
@@ -14,21 +14,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class Scenario implements XMLHashable {
-    // Loads the simulation field.
-    // To be implemented
     private double valG;
     private double valRes;
     private final List<Planet> planets;
+    private String name;
     private ExecutorService runner;
 
     public Scenario() {
-        this(6.67e-11, 1e10, new ArrayList<>());
+        this(6.67e-11, 1e10, new ArrayList<>(), "Unnamed Scenario");
     }
 
-    public Scenario(double valG, double valRes, List<Planet> planets) {
+    public Scenario(double valG, double valRes, List<Planet> planets, String name) {
         this.valG = valG;
         this.valRes = valRes;
         this.planets = planets;
+        this.name = name;
         Simulator.setPlanets(planets); // due to referencing, this updates automatically
         Simulator.setValG(valG);
         Simulator.setValRes(valRes);
@@ -64,11 +64,20 @@ public class Scenario implements XMLHashable {
         Simulator.setValG(valG);
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     @Override
     public XMLNodeInfo hashed() {
         HashMap<String, XMLNodeInfo> hashed = new HashMap<>();
         hashed.put("valG", new XMLNodeInfo(String.valueOf(valG)));
         hashed.put("valRes", new XMLNodeInfo(String.valueOf(valRes)));
+        hashed.put("name", new XMLNodeInfo(name));
         List<XMLNodeInfo> planetsHashed = new ArrayList<>();
         planets.forEach(e -> planetsHashed.add(e.hashed()));
         hashed.put("planets", XMLList.hashed(planetsHashed));
@@ -80,12 +89,13 @@ public class Scenario implements XMLHashable {
             Map<String, XMLNodeInfo> hashed = info.getDataTable();
             double valG = Double.parseDouble(hashed.get("valG").getValue());
             double valRes = Double.parseDouble(hashed.get("valRes").getValue());
+            String name = hashed.get("name").getValue();
             List<XMLNodeInfo> planetsHashed = XMLList.fromXML(hashed.get("planets"));
             List<Planet> planets = new ArrayList<>();
             for (XMLNodeInfo planetInfo : planetsHashed) {
                 planets.add(Planet.fromXML(planetInfo));
             }
-            return new Scenario(valG, valRes, planets);
+            return new Scenario(valG, valRes, planets, name);
         } catch (XMLParseException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.XML_ERROR);
         }

@@ -1,6 +1,6 @@
 package astrosim.model.simulation;
 
-import astrosim.model.files.Settings;
+import astrosim.model.managers.Settings;
 import astrosim.model.math.Vector2D;
 
 import java.util.List;

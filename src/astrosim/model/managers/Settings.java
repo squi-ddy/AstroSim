@@ -1,4 +1,4 @@
-package astrosim.model.files;
+package astrosim.model.managers;
 
 import astrosim.model.simulation.OrbitalPath;
 import astrosim.model.xml.XMLNodeInfo;
@@ -14,7 +14,7 @@ public class Settings {
     private static final Path filepath = Paths.get(System.getProperty("user.dir"), "settings.xml");
     private static XMLParser settingsXML;
     private static short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines time step
-    private static Path lastSave = null; // file path to last save; provides smoothness
+    private static String lastSave = null; // file path to last save; provides smoothness
     private static short speed = 1; // The speed of the simulation
     private static int maxPointsInTrail = 150;
     private static int maxBufferInTrail = 150;
@@ -27,10 +27,14 @@ public class Settings {
             ResourceManager.guaranteeExists(filepath, "/settings.xml");
             Settings.settingsXML = new XMLParser(filepath);
             fromXML(Settings.settingsXML.getContent(new String[]{"settings"}).get("settings"));
-        } catch (XMLParseException e) {
+            // A sleep for the splash screen
+            Thread.sleep(2000);
+        } catch (XMLParseException | InterruptedException e) {
             e.printStackTrace();
         }
     }
+
+    public static void waitUntilInit() { /* Empty method to wait for construct */ }
 
     public static void setDarkMode(boolean darkMode) {
         Settings.darkMode = darkMode;
@@ -97,14 +101,14 @@ public class Settings {
         return accuracy;
     }
 
-    public static Path getLastSave() {
+    public static String getLastSave() {
         return lastSave;
     }
 
-    public static void setLastSave(Path lastSave) {
+    public static void setLastSave(String lastSave) {
         Settings.lastSave = lastSave;
         try {
-            settingsXML.writeContent(new String[]{"settings", "lastSave"}, new XMLNodeInfo((lastSave != null) ? lastSave.toAbsolutePath().toString() : "null"));
+            settingsXML.writeContent(new String[]{"settings", "lastSave"}, new XMLNodeInfo((lastSave != null) ? lastSave : "null"));
         } catch (XMLParseException e) {
             // ???
         }
@@ -114,15 +118,11 @@ public class Settings {
         settingsXML.saveXML();
     }
 
-    private static void restoreDefaults() {
-        ResourceManager.restoreDefault(filepath);
-    }
-
     private static void fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
             var settings = info.getDataTable();
             accuracy = Short.parseShort(settings.get("accuracy").getValue());
-            lastSave = (settings.get("lastSave").getValue().equals("null") ? null : Path.of(settings.get("lastSave").getValue()));
+            lastSave = (settings.get("lastSave").getValue().equals("null") ? null : settings.get("lastSave").getValue());
             speed = Short.parseShort(settings.get("speed").getValue());
             maxBufferInTrail = Integer.parseInt(settings.get("bufferLen").getValue());
             OrbitalPath.setMaxBufferLength(maxBufferInTrail);
@@ -130,7 +130,6 @@ public class Settings {
             OrbitalPath.setMaxLength(maxPointsInTrail);
             darkMode = Boolean.parseBoolean(settings.get("dark").getValue());
         } catch (XMLParseException | NumberFormatException | NullPointerException e) {
-            restoreDefaults();
             throw new XMLParseException(XMLParseException.XML_ERROR);
         }
     }

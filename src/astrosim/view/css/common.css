@@ -1,12 +1,22 @@
 /*
-ScrollPane css stuff
+Some theme-independent colors
 */
 
-.scroll-pane > .viewport {
+.root {
+    -background-color-1: #03244f;
+}
+
+/*
+SaveChooser ScrollPane css stuff
+*/
+
+.save-chooser > .viewport,
+.save-chooser > .scroll-bar
+{
     -fx-background-color: transparent;
 }
 
-.scroll-pane {
+.save-chooser {
     -fx-background-color: -theme-color-3;
     -fx-background-radius: 5;
     -fx-border-color: -theme-color-2;
@@ -14,41 +24,33 @@ ScrollPane css stuff
     -fx-padding: 5;
 }
 
-.scroll-pane > .scroll-bar {
-    -fx-background-color: transparent;
-}
-
-.scroll-pane > .scroll-bar:vertical {
+.save-chooser > .scroll-bar:vertical {
     -fx-padding: 5 2 5 0;
     -fx-scale-x: 0.9;
 }
 
-.scroll-pane > .scroll-bar > .decrement-button > .decrement-arrow,
-.scroll-pane > .scroll-bar > .increment-button > .increment-arrow
+.save-chooser > .scroll-bar > .decrement-button > .decrement-arrow,
+.save-chooser > .scroll-bar > .increment-button > .increment-arrow
 {
     -fx-scale-x: 0.85;
     -fx-scale-y: 0.85;
     -fx-background-color: -theme-color-2;
 }
 
-.scroll-pane > .scroll-bar:vertical {
-    -fx-padding: 5 2 5 0;
-    -fx-scale-x: 0.9;
-}
-
-.scroll-pane > .scroll-bar:horizontal {
+.save-chooser > .scroll-bar:horizontal {
     -fx-padding: 0 5 2 5;
     -fx-scale-y: 0.9;
 }
 
-.scroll-pane > .scroll-bar > .thumb {
+.save-chooser > .scroll-bar > .thumb {
     -fx-background-color: -theme-color-2;
 }
 
 /*
 Stuff inside ScrollPanes
 */
-.scroll-pane-elem {
+
+.save-chooser-elem {
     -fx-background-color: -theme-color-1;
     -fx-background-radius: 5;
     -fx-border-color: -theme-color-2;
@@ -56,31 +58,85 @@ Stuff inside ScrollPanes
     -fx-padding: 5;
 }
 
-.scroll-pane-elem:hover {
+.save-chooser-elem:hover {
     -fx-background-color: derive(-theme-color-1, 10%);
 }
 
 /*
 A cool, theme-fitting button
 */
+
 .themed-button > SVGPath {
     -fx-stroke: -theme-text-color-2;
-    -fx-stroke-width: 2.5;
-    -fx-stroke-line-cap: round;
+    -fx-fill: -theme-text-color-2;
 }
 
-.themed-button:hover > SVGPath {
+.themed-button:hover > SVGPath,
+.themed-button:selected > SVGPath
+{
     -fx-stroke: -theme-text-color-1;
-    -fx-stroke-width: 2.5;
-    -fx-stroke-line-cap: round;
+    -fx-fill: -theme-text-color-1;
 }
 
 .themed-button {
-    -fx-background-color: derive(-theme-color-1, 10%);
+    -fx-background-color: -theme-color-1;
     -fx-background-radius: 5;
     -fx-padding: 8;
 }
 
-.themed-button:hover {
-    -fx-background-color: derive(-theme-color-1, 30%);
+.themed-button:hover,
+.themed-button:selected
+{
+    -fx-background-color: derive(-theme-color-1, 50%);
 }
+
+/*
+Simulator ScrollPane stuff
+*/
+
+.simulator {
+    -fx-background-color: -background-color-1;
+}
+
+/*
+Menu buttons on top bar of simulator screen
+*/
+
+.simulator-menu:hover,
+.simulator-menu-selected
+{
+    -fx-background-color: derive(-theme-color-1, 50%);
+    -fx-text-fill: -theme-text-color-1;
+}
+
+.simulator-menu
+{
+    -fx-background-color: -theme-color-1;
+    -fx-text-fill: -theme-text-color-2;
+}
+
+.simulator-menu-dropdown
+{
+    -fx-background-color: -theme-color-1;
+}
+
+.simulator-menu-dropdown-label,
+.simulator-menu-dropdown-spacer
+{
+    -fx-background-color: -theme-color-1;
+    -fx-padding: 0 5 0 5;
+}
+
+.simulator-menu-dropdown-label > .label {
+    -fx-text-fill: -theme-text-color-2;
+}
+
+.simulator-menu-dropdown-label:hover
+{
+    -fx-background-color: derive(-theme-color-1, 50%);
+}
+
+.simulator-menu-dropdown-label:hover > .label {
+    -fx-text-fill: -theme-text-color-1;
+}
+

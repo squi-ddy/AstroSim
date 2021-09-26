@@ -5,7 +5,6 @@ import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.Settings;
 import astrosim.model.xml.XMLParseException;
 import astrosim.model.xml.XMLParser;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
@@ -20,6 +19,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
 import javafx.scene.text.Font;
+import javafx.stage.Stage;
 
 import java.net.URL;
 import java.util.Objects;
@@ -31,10 +31,16 @@ public class ScenarioChooserController implements Initializable {
     @FXML
     private ImageView logoImage;
 
+    private Stage stage;
+
+    public void setStage(Stage stage) {
+        this.stage = stage;
+    }
+
     private Parent createScenarioTile(String fileName, String scenarioName) {
         VBox root = new VBox();
         root.setAlignment(Pos.TOP_CENTER);
-        root.getStyleClass().add("scroll-pane-elem");
+        root.getStyleClass().add("save-chooser-elem");
         Label topLabel = new Label(scenarioName);
         topLabel.setFont(new Font(18));
         topLabel.setStyle("-fx-text-fill: -theme-text-color-2;");
@@ -49,7 +55,7 @@ public class ScenarioChooserController implements Initializable {
             bottomLabel.setStyle("-fx-text-fill: -theme-text-color-1;");
             SVGPath xSymbolShape = new SVGPath();
             xSymbolShape.setContent("M 5 5 L -5 -5 M -5 5 L 5 -5");
-            xSymbolShape.setStyle("");
+            xSymbolShape.setStyle("-fx-stroke-width: 2.5; -fx-stroke-line-cap: round;");
             Button xButton = new Button();
             Group xButtonGroup = new Group();
             xButton.setGraphic(xSymbolShape);
@@ -73,15 +79,18 @@ public class ScenarioChooserController implements Initializable {
         root.setOnMouseClicked(e -> {
             if (e.getClickCount() >= 2 && e.getButton() == MouseButton.PRIMARY) {
                 ScenarioManager.loadScenario(fileName);
-                ScenarioManager.renderScenario();
+                ScenarioManager.renderScenario(stage);
+                stage.showAndWait();
             }
         });
         return root;
     }
 
     @FXML
-    private void createScenario(ActionEvent e) {
+    private void createScenario() {
         ScenarioManager.makeScenario();
+        ScenarioManager.renderScenario(stage);
+        stage.showAndWait();
     }
 
     private void doIfEmpty() {

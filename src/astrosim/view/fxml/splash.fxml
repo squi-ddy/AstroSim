@@ -7,10 +7,10 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #03244f; -fx-border-color: #33aa77; -fx-border-width: 5;" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.SplashController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" opacity="0.7" prefHeight="450.0" prefWidth="800.0" style="-fx-background-color: #03244f; -fx-border-color: #33aa77; -fx-border-width: 5;" xmlns="http://javafx.com/javafx/16.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.SplashController">
    <center>
       <StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="410.0" prefWidth="790.0" BorderPane.alignment="CENTER">
-         <ImageView fitHeight="410.0" fitWidth="790.0" fx:id="logoImage" pickOnBounds="true" preserveRatio="true" />
+         <ImageView fx:id="logoImage" fitHeight="410.0" fitWidth="790.0" pickOnBounds="true" preserveRatio="true" />
       </StackPane>
    </center>
    <bottom>

@@ -19,6 +19,7 @@
                 <mass>1.0E20</mass>
                 <name>Planet</name>
                 <radius>1000000.0</radius>
+                <color>#617283</color>
             </elem0>
             <size>1</size>
         </planets>

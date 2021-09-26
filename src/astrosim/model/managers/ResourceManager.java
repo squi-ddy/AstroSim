@@ -13,23 +13,17 @@ public class ResourceManager {
 
     private static final Path rootFP = Path.of(System.getProperty("user.dir"));
 
-    public static FileInputStream readFile(Path fp) {
-        // guarantee the file exists, returning its fp
-        return readFile(rootFP.relativize(fp).toString());
-    }
-
-    public static FileInputStream readFile(String fp) {
-        Path filePath = rootFP.resolve(Path.of(fp));
+    public static FileInputStream readFile(Path filePath) {
         File file = new File(String.valueOf(filePath));
         if (!file.exists()) {
             try {
                 Files.createDirectories(filePath.getParent());
-                if (ResourceManager.class.getResource("/" + fp) == null) {
+                if (ResourceManager.class.getResource("/" + rootFP.relativize(filePath)) == null) {
                     // no default, simply create blank file
                     Files.createFile(filePath);
                 } else {
                     // copy default over
-                    Files.copy(Objects.requireNonNull(ResourceManager.class.getResourceAsStream("/" + fp)), filePath);
+                    Files.copy(Objects.requireNonNull(ResourceManager.class.getResourceAsStream("/" + rootFP.relativize(filePath))), filePath);
                 }
             } catch (IOException e) {
                 e.printStackTrace();
@@ -42,6 +36,10 @@ public class ResourceManager {
             e.printStackTrace();
         }
         return is;
+    }
+
+    public static FileInputStream readFile(String fp) {
+        return readFile(rootFP.resolve(Path.of(fp)));
     }
 
     public static void restoreDefault(Path fp) throws IOException {

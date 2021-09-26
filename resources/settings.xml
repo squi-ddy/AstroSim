@@ -4,7 +4,7 @@
         <dark>true</dark>
         <accuracy>10</accuracy>
         <lastSave>firstTime</lastSave>
-        <speed>1</speed>
+        <speed>0</speed>
         <bufferLen>150</bufferLen>
         <trailLen>150</trailLen>
     </settings>

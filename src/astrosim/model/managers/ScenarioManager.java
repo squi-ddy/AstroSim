@@ -1,12 +1,20 @@
 package astrosim.model.managers;
 
+import astrosim.Main;
 import astrosim.model.simulation.Scenario;
 import astrosim.model.xml.XMLParseException;
 import astrosim.model.xml.XMLParser;
+import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Objects;
 
 public class ScenarioManager {
     // deals with loading and saving scenarios
@@ -18,7 +26,7 @@ public class ScenarioManager {
 
     static {
         String lastSave = Settings.getLastSave();
-        if (lastSave != null) {
+        if (lastSave != null && lastSave.matches(".+\\.xml")) {
             try {
                 parser = new XMLParser(ResourceManager.getPath("saves/" + lastSave));
                 scenario = Scenario.fromXML(parser.getContent().get("scenario"));
@@ -40,6 +48,7 @@ public class ScenarioManager {
     public static void deleteScenario(String name) {
         try {
             Files.delete(ResourceManager.getPath("saves/" + name));
+            Settings.setLastSave(null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,6 +60,7 @@ public class ScenarioManager {
 
     public static void loadScenario(String name) {
         try {
+            Settings.setLastSave(name);
             parser = new XMLParser(ResourceManager.getPath("saves/" + name));
             scenario = Scenario.fromXML(parser.getContent().get("scenario"));
         } catch (XMLParseException e) {
@@ -65,8 +75,20 @@ public class ScenarioManager {
         Settings.setLastSave(fileName);
     }
 
-    public static void renderScenario() {
-        // TODO: render scenario
+    public static void renderScenario(Stage toHide) {
+        try {
+            Stage stage = new Stage();
+            Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("view/fxml/simulator.fxml")));
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            Scene scene = new Scene(root);
+            stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
+            stage.setScene(scene);
+            stage.setTitle("AstroSim");
+            Platform.runLater(toHide::hide);
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void save() throws XMLParseException {parser.saveXML();}

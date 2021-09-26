@@ -5,8 +5,10 @@ import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 public class Planet implements XMLHashable {
     // A Planet. Constructed by Scenario.
@@ -15,33 +17,31 @@ public class Planet implements XMLHashable {
     private double mass;
     private double radius;
     private final OrbitalPath path;
+    private String color;
 
-    public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic, String name) {
+    private static final char[] converter = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
+
+    @SuppressWarnings("java:S2119")
+    private static String getRandomColor() {
+        StringBuilder result = new StringBuilder();
+        Random r = new Random();
+        for (int i = 0; i < 6; i++) {
+            result.append(converter[r.nextInt(16)]);
+        }
+        return "#" + result;
+    }
+
+    public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic, String name, String color) {
         this.mass = mass;
         this.radius = radius;
         this.isStatic = isStatic;
         this.name = name;
         this.path = new OrbitalPath(position, velocity);
+        this.color = color;
     }
 
-    public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic) {
-        this(position, velocity, mass, radius, isStatic, "Planet");
-    }
-
-    public Planet(Vector2D position, Vector2D velocity, double mass, double radius) {
-        this(position, velocity, mass, radius, false);
-    }
-
-    public Planet(Vector2D position, Vector2D velocity, double mass) {
-        this(position, velocity, mass, 1e6);
-    }
-
-    public Planet(Vector2D position, Vector2D velocity) {
-        this(position, velocity, 1e20);
-    }
-
-    public Planet() {
-        this(new Vector2D(), new Vector2D());
+    public Planet() throws NoSuchAlgorithmException {
+        this(new Vector2D(), new Vector2D(), 1e20, 1e6, false, "Planet", getRandomColor());
     }
 
     public double getMass() {
@@ -61,6 +61,14 @@ public class Planet implements XMLHashable {
     }
 
     public OrbitalPath getPath() {return path;}
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
 
     public boolean isStatic() {
         return isStatic;
@@ -98,6 +106,7 @@ public class Planet implements XMLHashable {
         hashed.put("radius", new XMLNodeInfo(String.valueOf(radius)));
         hashed.put("name", new XMLNodeInfo(String.valueOf(name)));
         hashed.put("path", path.hashed());
+        hashed.put("color", new XMLNodeInfo(color));
         return new XMLNodeInfo(hashed);
     }
 
@@ -109,7 +118,8 @@ public class Planet implements XMLHashable {
             double radius = Double.parseDouble(data.get("radius").getValue());
             String name = data.get("name").getValue();
             OrbitalPath path = OrbitalPath.fromXML(data.get("path"));
-            return new Planet(path.getPosition(), path.getVelocity(), mass, radius, isStatic, name);
+            String color = data.get("color").getValue();
+            return new Planet(path.getPosition(), path.getVelocity(), mass, radius, isStatic, name, color);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.XML_ERROR);
         }

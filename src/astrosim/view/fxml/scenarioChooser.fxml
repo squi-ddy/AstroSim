@@ -12,9 +12,9 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" styleClass="root" stylesheets="@../css/common.css" xmlns="http://javafx.com/javafx/15.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.ScenarioChooserController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" styleClass="root" stylesheets="@../css/common.css" xmlns="http://javafx.com/javafx/16.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.ScenarioChooserController">
    <left>
-      <VBox alignment="CENTER" prefWidth="300.0" style="-fx-background-color: #03244f; -fx-border-width: 0 1 0 0; -fx-border-color: -theme-color-2;" BorderPane.alignment="CENTER">
+      <VBox alignment="CENTER" prefWidth="300.0" style="-fx-background-color: -background-color-1; -fx-border-width: 0 1 0 0; -fx-border-color: -theme-color-2;" BorderPane.alignment="CENTER">
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
@@ -35,7 +35,7 @@
    <center>
       <BorderPane style="-fx-background-color: -theme-color-1;" BorderPane.alignment="CENTER">
          <center>
-            <ScrollPane fitToWidth="true" hbarPolicy="NEVER">
+            <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="save-chooser">
                <BorderPane.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" />
                </BorderPane.margin>

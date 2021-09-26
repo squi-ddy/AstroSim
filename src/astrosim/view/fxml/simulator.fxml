@@ -1,9 +1,94 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.layout.AnchorPane?>
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="astrosim.view.Simulator"
-            prefHeight="400.0" prefWidth="600.0">
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.TextFlow?>
 
-</AnchorPane>
+<StackPane fx:id="root" prefHeight="720.0" prefWidth="1280.0" styleClass="root" stylesheets="@../css/common.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.SimulatorGUIController">
+   <BorderPane fx:id="simulatorRoot" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0">
+      <top>
+         <HBox alignment="BASELINE_LEFT" style="-fx-background-color: -theme-color-1;" BorderPane.alignment="TOP_CENTER">
+            <BorderPane.margin>
+               <Insets />
+            </BorderPane.margin>
+            <Label fx:id="fileMenuItem" styleClass="simulator-menu" text="File">
+               <padding>
+                  <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+               </padding>
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+            <Label fx:id="objectMenuItem" styleClass="simulator-menu" text="Object">
+               <padding>
+                  <Insets bottom="2.0" left="5.0" right="5.0" top="2.0" />
+               </padding>
+               <font>
+                  <Font size="16.0" />
+               </font>
+            </Label>
+         </HBox>
+      </top>
+      <center>
+         <Pane fx:id="simulationPane" styleClass="simulator">
+            <Pane fx:id="simulationInnerPane">
+               <Pane prefHeight="100" prefWidth="100" style="-fx-background-color: white" />
+            </Pane>
+         </Pane>
+      </center>
+      <bottom>
+         <BorderPane style="-fx-background-color: -theme-color-1;" BorderPane.alignment="CENTER">
+            <center>
+               <HBox alignment="CENTER_LEFT" spacing="2.5">
+                  <ToggleButton fx:id="pauseButton" mnemonicParsing="false" styleClass="themed-button">
+                     <graphic>
+                        <SVGPath content="M -4 -7 L -4 7 M 4 7 L 4 -7" fill="TRANSPARENT" stroke="WHITE" strokeLineCap="ROUND" strokeWidth="2.5" />
+                     </graphic>
+                     <HBox.margin>
+                        <Insets bottom="3.0" left="2.5" top="3.0" />
+                     </HBox.margin>
+                  </ToggleButton>
+                  <ToggleButton fx:id="speed1Button" mnemonicParsing="false" styleClass="themed-button">
+                     <graphic>
+                        <SVGPath content="M -6.5 -8 V 8 L 6.5 0 Z" fill="WHITE" stroke="WHITE" strokeLineCap="ROUND" strokeLineJoin="BEVEL" strokeWidth="0.5" />
+                     </graphic>
+                  </ToggleButton>
+                  <ToggleButton fx:id="speed2Button" mnemonicParsing="false" styleClass="themed-button">
+                     <graphic>
+                        <SVGPath content="M -6 -8 V 8 L 0 4 V 8 L 12 0 L 0 -8 V -4 Z" fill="TRANSPARENT" stroke="WHITE" strokeLineCap="ROUND" strokeLineJoin="BEVEL" strokeWidth="0.5" />
+                     </graphic>
+                  </ToggleButton>
+                  <ToggleButton fx:id="speed3Button" mnemonicParsing="false" styleClass="themed-button">
+                     <graphic>
+                        <SVGPath content="M -5 -8 V 8 L 0 4 V 8 L 5 4 V 8 L 15 0 L 5 -8 V -4 L 0 -8 V -4 Z" fill="TRANSPARENT" stroke="WHITE" strokeLineCap="ROUND" strokeLineJoin="BEVEL" strokeWidth="0.5" />
+                     </graphic>
+                  </ToggleButton>
+               </HBox>
+            </center>
+            <right>
+               <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+                  <BorderPane.margin>
+                     <Insets right="5.0" />
+                  </BorderPane.margin>
+                  <TextFlow>
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text="Mouse at (" />
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text="x" fx:id="xLabel" />
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text=", " />
+                     <Label fx:id="yLabel" style="-fx-text-fill: -theme-text-color-1;" text="y" />
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text=")" />
+                  </TextFlow>
+               </VBox>
+            </right>
+         </BorderPane>
+      </bottom>
+   </BorderPane>
+</StackPane>

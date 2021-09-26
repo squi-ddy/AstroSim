@@ -5,6 +5,7 @@ module AstroSim {
     opens astrosim.model.managers;
     opens astrosim.model.math;
     opens astrosim.model.simulation;
+    opens astrosim.view.guihelpers;
     opens astrosim;
     requires javafx.base;
     requires javafx.controls;

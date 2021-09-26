@@ -56,6 +56,7 @@ public class SplashController implements Initializable {
         }).start();
     }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
     private void loadFile() {
         if (Settings.getLastSave() != null && !Settings.getLastSave().equals("firstTime")) {
             statusLabel.setText("Loading save...");
@@ -63,7 +64,7 @@ public class SplashController implements Initializable {
                 if (ScenarioManager.waitUntilInit()) {
                     Platform.runLater(() -> {
                         statusFlash.stop();
-                        ScenarioManager.renderScenario();
+                        ScenarioManager.renderScenario(rootStage);
                     });
                 }
                 else {
@@ -73,24 +74,34 @@ public class SplashController implements Initializable {
                 }
             }).start();
         } else {
-            if (Objects.equals(Settings.getLastSave(), "firstTime")) {
-                ResourceManager.copyFromResourceDirectory("/defaultSaves/", "saves/");
-            }
-            try {
-                Parent parent = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("view/fxml/scenarioChooser.fxml")));
-                parent.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
-                Scene scene = new Scene(parent);
-                Stage stage = new Stage();
-                stage.setTitle("AstroSim");
-                stage.setScene(scene);
-                stage.setResizable(false);
-                stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
-                statusFlash.stop();
-                rootStage.close();
-                stage.showAndWait();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            statusLabel.setText("Setting up...");
+            new Thread(() -> {
+                if (Objects.equals(Settings.getLastSave(), "firstTime")) {
+                    ResourceManager.copyFromResourceDirectory("/defaultSaves/", "saves/");
+                }
+                ScenarioManager.waitUntilInit();
+                Platform.runLater(this::loadScenarioChooser);
+            }).start();
+        }
+    }
+
+    private void loadScenarioChooser() {
+        try {
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(Main.class.getResource("view/fxml/scenarioChooser.fxml")));
+            Parent root = loader.load();
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            Scene scene = new Scene(root);
+            Stage stage = new Stage();
+            loader.<ScenarioChooserController>getController().setStage(stage);
+            stage.setTitle("AstroSim");
+            stage.setScene(scene);
+            stage.setResizable(false);
+            stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
+            statusFlash.stop();
+            rootStage.close();
+            stage.showAndWait();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

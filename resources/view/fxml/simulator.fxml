@@ -2,7 +2,6 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -39,11 +38,12 @@
          </HBox>
       </top>
       <center>
-         <Pane fx:id="simulationPane" styleClass="simulator">
-            <Pane fx:id="simulationInnerPane">
-               <Pane prefHeight="100" prefWidth="100" style="-fx-background-color: white" />
+         <StackPane fx:id="simulationPane" styleClass="simulator">
+            <Pane managed="false">
+               <Pane fx:id="simulationInnerPane">
+               </Pane>
             </Pane>
-         </Pane>
+         </StackPane>
       </center>
       <bottom>
          <BorderPane style="-fx-background-color: -theme-color-1;" BorderPane.alignment="CENTER">
@@ -80,7 +80,9 @@
                      <Insets right="5.0" />
                   </BorderPane.margin>
                   <TextFlow>
-                     <Label style="-fx-text-fill: -theme-text-color-1;" text="Mouse at (" />
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text="100" fx:id="zoomLabel"/>
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text="\%; " />
+                     <Label style="-fx-text-fill: -theme-text-color-1;" text="(" />
                      <Label style="-fx-text-fill: -theme-text-color-1;" text="x" fx:id="xLabel" />
                      <Label style="-fx-text-fill: -theme-text-color-1;" text=", " />
                      <Label fx:id="yLabel" style="-fx-text-fill: -theme-text-color-1;" text="y" />

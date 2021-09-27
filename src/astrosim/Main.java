@@ -15,7 +15,7 @@ import java.util.Objects;
 public class Main extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("view/fxml/splash.fxml")));
+        FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource("/view/fxml/splash.fxml")));
         Parent root = loader.load();
         loader.<SplashController>getController().setStage(stage);
         Scene scene = new Scene(root);
@@ -26,5 +26,9 @@ public class Main extends Application {
         scene.setFill(Color.TRANSPARENT);
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
         stage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 }

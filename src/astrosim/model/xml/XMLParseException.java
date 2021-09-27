@@ -1,23 +1,26 @@
 package astrosim.model.xml;
 
 public class XMLParseException extends Exception {
-    public static final short XML_ERROR = 0;
-    public static final short TAG_NOT_FOUND = 1;
-    public static final short IO_EXCEPTION = 2;
-    public static final short CANNOT_FIND_FILE = 3;
-    public static final short WRONG_NODE_TYPE = 4;
-    private final short type;
+    private final Type type;
 
-    public XMLParseException(short type) {
+    public XMLParseException(Type type) {
         this(type, "");
     }
 
-    public XMLParseException(short type, String message) {
+    public XMLParseException(Type type, String message) {
         super(message);
         this.type = type;
     }
 
-    public int getType() {
+    public Type getType() {
         return type;
+    }
+
+    public enum Type {
+        XML_ERROR,
+        TAG_NOT_FOUND,
+        IO_EXCEPTION,
+        WRONG_NODE_TYPE,
+        READ_ONLY
     }
 }

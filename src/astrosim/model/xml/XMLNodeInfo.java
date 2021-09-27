@@ -24,12 +24,12 @@ public class XMLNodeInfo {
     }
 
     public Map<String, XMLNodeInfo> getDataTable() throws XMLParseException {
-        if (nodeType == HAS_VALUE) throw new XMLParseException(XMLParseException.WRONG_NODE_TYPE);
+        if (nodeType == HAS_VALUE) throw new XMLParseException(XMLParseException.Type.WRONG_NODE_TYPE);
         return dataTable;
     }
 
     public String getValue() throws XMLParseException {
-        if (nodeType == HAS_CHILDREN) throw new XMLParseException(XMLParseException.WRONG_NODE_TYPE);
+        if (nodeType == HAS_CHILDREN) throw new XMLParseException(XMLParseException.Type.WRONG_NODE_TYPE);
         return value; // Should be cast by anyone who uses this data
     }
 }

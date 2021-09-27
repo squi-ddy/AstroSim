@@ -40,7 +40,7 @@ public class Planet implements XMLHashable {
         this.color = color;
     }
 
-    public Planet() throws NoSuchAlgorithmException {
+    public Planet() {
         this(new Vector2D(), new Vector2D(), 1e20, 1e6, false, "Planet", getRandomColor());
     }
 
@@ -121,7 +121,7 @@ public class Planet implements XMLHashable {
             String color = data.get("color").getValue();
             return new Planet(path.getPosition(), path.getVelocity(), mass, radius, isStatic, name, color);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 

@@ -1,4 +1,4 @@
-package astrosim.view.guihelpers;
+package astrosim.view.helpers;
 
 import javafx.geometry.Bounds;
 import javafx.scene.Group;
@@ -32,12 +32,22 @@ public class MenuRenderer {
         Group wrapper = new Group(root);
         wrapper.setManaged(false);
         wrapper.setUserData("menu" + menuLabel.getText());
+        addEventHandlers(root, menuLabel, wrapper, rootPane);
+    }
+
+    private static void addEventHandlers(VBox root, Label menuLabel, Group wrapper, StackPane rootPane) {
         menuLabel.setOnMouseClicked(e -> {
             Bounds boundsInScene = menuLabel.localToScene(menuLabel.getBoundsInLocal());
             wrapper.setLayoutX(boundsInScene.getMinX());
             wrapper.setLayoutY(boundsInScene.getMaxY());
             menuLabel.getStyleClass().replaceAll(s -> s.equals("simulator-menu") ? "simulator-menu-selected" : s);
             rootPane.getChildren().add(wrapper);
+        });
+        menuLabel.setOnMouseExited(e -> {
+            if (e.getY() < menuLabel.getBoundsInLocal().getMaxY() - 2) {
+                rootPane.getChildren().remove(wrapper);
+                menuLabel.getStyleClass().replaceAll(s -> s.equals("simulator-menu-selected") ? "simulator-menu" : s);
+            }
         });
         root.setOnMouseExited(e -> {
             rootPane.getChildren().remove(wrapper);

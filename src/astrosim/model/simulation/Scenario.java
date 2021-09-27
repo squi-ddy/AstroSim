@@ -97,7 +97,7 @@ public class Scenario implements XMLHashable {
             }
             return new Scenario(valG, valRes, planets, name);
         } catch (XMLParseException | NumberFormatException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 }

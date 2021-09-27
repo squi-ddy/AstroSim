@@ -1,10 +1,8 @@
 package astrosim.model.managers;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -101,30 +99,6 @@ public class ResourceManager {
 
     public static Path getPath(String append) {
         return rootFP.resolve(Path.of(append));
-    }
-
-    public static void copyFromResourceDirectory(String source, Path target) {
-        Stream<Path> toBeCopied = null;
-        try {
-            Path sourcePath = Path.of(Objects.requireNonNull(ResourceManager.class.getResource(source)).toURI());
-            toBeCopied = Files.list(sourcePath);
-            Files.createDirectories(target);
-            toBeCopied.forEach(p -> {
-                try {
-                    Files.copy(p, target.resolve(sourcePath.relativize(p)), StandardCopyOption.REPLACE_EXISTING);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
-        } catch (IOException | URISyntaxException e) {
-            e.printStackTrace();
-        } finally {
-            if (toBeCopied != null) toBeCopied.close();
-        }
-    }
-
-    public static void copyFromResourceDirectory(String source, String target) {
-        copyFromResourceDirectory(source, rootFP.resolve(Path.of(target)));
     }
 
     public static Stream<Path> getFilesInDirectory(String directory) {

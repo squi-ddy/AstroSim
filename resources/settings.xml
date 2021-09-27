@@ -7,5 +7,6 @@
         <speed>0</speed>
         <bufferLen>150</bufferLen>
         <trailLen>150</trailLen>
+        <sensitivity>100</sensitivity>
     </settings>
 </astrosim>

@@ -19,6 +19,7 @@ public class Settings {
     private static int maxPointsInTrail = 150;
     private static int maxBufferInTrail = 150;
     private static boolean darkMode = true;
+    private static int sensitivity = 100;
 
     // Data class: stores settings from settings.xml (i.e. global settings)
 
@@ -29,7 +30,7 @@ public class Settings {
             fromXML(Settings.settingsXML.getContent(new String[]{"settings"}).get("settings"));
             // A sleep for the splash screen
             Thread.sleep(2000);
-        } catch (XMLParseException | InterruptedException e) {
+        } catch (@SuppressWarnings("java:S2142") XMLParseException | InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -93,6 +94,19 @@ public class Settings {
         }
     }
 
+    public static void setSensitivity(int sensitivity) {
+        Settings.sensitivity = sensitivity;
+        try {
+            settingsXML.writeContent(new String[]{"settings", "sensitivity"}, new XMLNodeInfo(String.valueOf(sensitivity)));
+        } catch (XMLParseException e) {
+            // ???
+        }
+    }
+
+    public static int getSensitivity() {
+        return sensitivity;
+    }
+
     public static short getSpeed() {
         return speed;
     }
@@ -129,8 +143,9 @@ public class Settings {
             maxPointsInTrail = Integer.parseInt(settings.get("trailLen").getValue());
             OrbitalPath.setMaxLength(maxPointsInTrail);
             darkMode = Boolean.parseBoolean(settings.get("dark").getValue());
+            sensitivity = Integer.parseInt(settings.get("sensitivity").getValue());
         } catch (XMLParseException | NumberFormatException | NullPointerException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 }

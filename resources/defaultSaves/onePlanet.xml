@@ -17,9 +17,9 @@
                 </path>
                 <static>false</static>
                 <mass>1.0E20</mass>
-                <name>Planet</name>
+                <name>Mars</name>
                 <radius>1000000.0</radius>
-                <color>#617283</color>
+                <color>#ff0000</color>
             </elem0>
             <size>1</size>
         </planets>

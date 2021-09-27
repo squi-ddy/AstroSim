@@ -27,7 +27,7 @@ public class XMLList {
             }
             return list;
         } catch (XMLParseException | NumberFormatException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 }

@@ -17,6 +17,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -37,9 +38,26 @@ public class XMLParser {
             Document xmlFile = db.parse(new File(this.filepath.toString()));
             this.contentCache = recursiveReader(xmlFile.getDocumentElement());
         } catch (ParserConfigurationException | SAXException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         } catch (IOException e) {
-            throw new XMLParseException(XMLParseException.IO_EXCEPTION);
+            throw new XMLParseException(XMLParseException.Type.IO_EXCEPTION);
+        }
+    }
+
+    public XMLParser(InputStream content) throws XMLParseException {
+        filepath = null;
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        try {
+            dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+            dbf.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            Document xmlFile = db.parse(content);
+            this.contentCache = recursiveReader(xmlFile.getDocumentElement());
+        } catch (ParserConfigurationException | SAXException e) {
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
+        } catch (IOException e) {
+            throw new XMLParseException(XMLParseException.Type.IO_EXCEPTION);
         }
     }
 
@@ -50,7 +68,7 @@ public class XMLParser {
     public Map<String, XMLNodeInfo> getContent(String[] path) throws XMLParseException {
         HashMap<String, XMLNodeInfo> result = new HashMap<>();
         XMLNodeInfo node = getNodeByPath(path);
-        if (node == null) throw new XMLParseException(XMLParseException.TAG_NOT_FOUND);
+        if (node == null) throw new XMLParseException(XMLParseException.Type.TAG_NOT_FOUND);
         result.put(path[path.length - 1], node);
         return result;
     }
@@ -59,12 +77,13 @@ public class XMLParser {
         // Writes to cache, not file (fast)
         // File only written upon save()
         XMLNodeInfo parent = getNodeByPath(Arrays.copyOf(path, path.length - 1));
-        if (parent == null || parent.getNodeType() != XMLNodeInfo.HAS_CHILDREN) throw new XMLParseException(XMLParseException.TAG_NOT_FOUND);
+        if (parent == null || parent.getNodeType() != XMLNodeInfo.HAS_CHILDREN) throw new XMLParseException(XMLParseException.Type.TAG_NOT_FOUND);
         Map<String, XMLNodeInfo> oldInfo = parent.getDataTable();
         oldInfo.put(path[path.length - 1], info);
     }
 
     public void saveXML() throws XMLParseException {
+        if (filepath == null) throw new XMLParseException(XMLParseException.Type.READ_ONLY);
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             DocumentBuilder db = dbf.newDocumentBuilder();
@@ -86,7 +105,7 @@ public class XMLParser {
             StreamResult result = new StreamResult(new File(filepath.toString()));
             transformer.transform(source, result);
         } catch (ParserConfigurationException | TransformerException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 

@@ -68,7 +68,7 @@ public class Vector2D implements XMLHashable {
             double y = Double.parseDouble(data.get("y").getValue());
             return new Vector2D(x, y);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 

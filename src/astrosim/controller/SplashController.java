@@ -1,9 +1,12 @@
 package astrosim.controller;
 
 import astrosim.Main;
-import astrosim.model.managers.ResourceManager;
 import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.Settings;
+import astrosim.model.xml.XMLList;
+import astrosim.model.xml.XMLNodeInfo;
+import astrosim.model.xml.XMLParseException;
+import astrosim.model.xml.XMLParser;
 import javafx.animation.Animation;
 import javafx.animation.FadeTransition;
 import javafx.application.Platform;
@@ -20,6 +23,10 @@ import javafx.util.Duration;
 
 import java.io.IOException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -77,7 +84,7 @@ public class SplashController implements Initializable {
             statusLabel.setText("Setting up...");
             new Thread(() -> {
                 if (Objects.equals(Settings.getLastSave(), "firstTime")) {
-                    ResourceManager.copyFromResourceDirectory("/defaultSaves/", "saves/");
+                    copyAllDefaults();
                 }
                 ScenarioManager.waitUntilInit();
                 Platform.runLater(this::loadScenarioChooser);
@@ -87,9 +94,9 @@ public class SplashController implements Initializable {
 
     private void loadScenarioChooser() {
         try {
-            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(Main.class.getResource("view/fxml/scenarioChooser.fxml")));
+            FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(Main.class.getResource("/view/fxml/scenarioChooser.fxml")));
             Parent root = loader.load();
-            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
             Scene scene = new Scene(root);
             Stage stage = new Stage();
             loader.<ScenarioChooserController>getController().setStage(stage);
@@ -101,6 +108,24 @@ public class SplashController implements Initializable {
             rootStage.close();
             stage.showAndWait();
         } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void copyAllDefaults() {
+        try {
+            XMLParser parser = new XMLParser(getClass().getResourceAsStream("/defaultSaveNames.xml"));
+            XMLNodeInfo info = parser.getContent().get("saveNames");
+            List<XMLNodeInfo> nodeInfo = XMLList.fromXML(info);
+            nodeInfo.forEach(e -> {
+                try {
+                    String fileName = e.getValue();
+                    Files.copy(Objects.requireNonNull(getClass().getResourceAsStream("/defaultSaves/" + fileName)), Path.of(System.getProperty("user.dir"), "saves", fileName), StandardCopyOption.REPLACE_EXISTING);
+                } catch (XMLParseException | IOException ex) {
+                    ex.printStackTrace();
+                }
+            });
+        } catch (XMLParseException e) {
             e.printStackTrace();
         }
     }

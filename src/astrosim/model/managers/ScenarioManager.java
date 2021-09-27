@@ -36,7 +36,7 @@ public class ScenarioManager {
         }
         try {
             Thread.sleep(2000);
-        } catch (InterruptedException e) {
+        } catch (@SuppressWarnings("java:S2142") InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -78,8 +78,8 @@ public class ScenarioManager {
     public static void renderScenario(Stage toHide) {
         try {
             Stage stage = new Stage();
-            Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("view/fxml/simulator.fxml")));
-            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/view/fxml/simulator.fxml")));
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
             Scene scene = new Scene(root);
             stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
             stage.setScene(scene);

@@ -118,13 +118,14 @@ Menu buttons on top bar of simulator screen
 .simulator-menu-dropdown
 {
     -fx-background-color: -theme-color-1;
+    -fx-border-color: -theme-color-2;
 }
 
 .simulator-menu-dropdown-label,
 .simulator-menu-dropdown-spacer
 {
     -fx-background-color: -theme-color-1;
-    -fx-padding: 0 5 0 5;
+    -fx-padding: 1 5 1 5;
 }
 
 .simulator-menu-dropdown-label > .label {
@@ -140,3 +141,12 @@ Menu buttons on top bar of simulator screen
     -fx-text-fill: -theme-text-color-1;
 }
 
+/*
+Planet stuff
+*/
+
+.planet-selected
+{
+    -fx-border-color: -theme-contrast-color-1;
+    -fx-border-width: 2;
+}

@@ -4,7 +4,6 @@ import astrosim.model.math.Vector2D;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
-import javafx.scene.shape.Polyline;
 
 import java.util.*;
 
@@ -58,15 +57,13 @@ public class OrbitalPath implements XMLHashable {
         return getPosition();
     }
 
-    public Polyline getTrail() {
+    public List<Double> getTrail() {
         List<Double> pts = new ArrayList<>();
         for (Vector2D pos : positionTrail) {
             pts.add(pos.getX());
             pts.add(pos.getY());
         }
-        Polyline pl = new Polyline();
-        pl.getPoints().addAll(pts);
-        return pl;
+        return pts;
     }
 
     public Vector2D getPosition() {
@@ -124,7 +121,7 @@ public class OrbitalPath implements XMLHashable {
             Vector2D velocity = Vector2D.fromXML(hashed.get("velocity"));
             return new OrbitalPath(position, velocity);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
-            throw new XMLParseException(XMLParseException.XML_ERROR);
+            throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
 }

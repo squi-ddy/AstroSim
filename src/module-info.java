@@ -7,7 +7,6 @@ module AstroSim {
     opens astrosim.view.helpers;
     opens astrosim;
     opens astrosim.view.nodes;
-    requires javafx.base;
     requires javafx.controls;
     requires javafx.fxml;
     requires java.xml;

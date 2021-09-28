@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<astrosim>
+    <settings>
+        <dark>true</dark>
+        <accuracy>10</accuracy>
+        <lastSave>firstTime</lastSave>
+        <speed>0</speed>
+        <bufferLen>150</bufferLen>
+        <trailLen>150</trailLen>
+        <sensitivity>100</sensitivity>
+    </settings>
+</astrosim>

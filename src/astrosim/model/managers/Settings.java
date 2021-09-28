@@ -7,6 +7,7 @@ import astrosim.model.xml.XMLParser;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 public class Settings {
     private Settings() {}
@@ -134,7 +135,7 @@ public class Settings {
 
     private static void fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
-            var settings = info.getDataTable();
+            Map<String, XMLNodeInfo> settings = info.getDataTable();
             accuracy = Short.parseShort(settings.get("accuracy").getValue());
             lastSave = (settings.get("lastSave").getValue().equals("null") ? null : settings.get("lastSave").getValue());
             speed = Short.parseShort(settings.get("speed").getValue());

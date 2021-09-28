@@ -7,6 +7,7 @@ import astrosim.model.simulation.Planet;
 import astrosim.model.simulation.Scenario;
 import astrosim.view.helpers.MenuItem;
 import astrosim.view.helpers.MenuRenderer;
+import astrosim.view.nodes.InspectorPane;
 import astrosim.view.nodes.PlanetNode;
 import javafx.animation.Animation;
 import javafx.animation.FillTransition;
@@ -69,6 +70,7 @@ public class SimulatorGUIController implements Initializable {
     private double currentScale = 1;
     private static final double SCALE_CONSTANT = 5e4;
     private final List<PlanetNode> planetNodes = new ArrayList<>();
+    private final InspectorPane inspector = new InspectorPane();
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -86,6 +88,7 @@ public class SimulatorGUIController implements Initializable {
         objectMenu.add(new MenuItem("Planet Inspector", this::openInspector));
         MenuRenderer.renderMenu(fileMenu, fileMenuItem, root);
         MenuRenderer.renderMenu(objectMenu, objectMenuItem, root);
+        simulatorRoot.setRight(inspector);
         setUpSimulator();
     }
 
@@ -102,7 +105,7 @@ public class SimulatorGUIController implements Initializable {
     }
 
     private void openInspector() {
-
+        inspector.showPane();
     }
 
     private void syncSpeedButtons() {
@@ -141,7 +144,7 @@ public class SimulatorGUIController implements Initializable {
         simulationPane.setOnScroll(e -> {
             if (!simulationInnerPane.getTransforms().contains(scale)) simulationInnerPane.getTransforms().add(scale);
             double direction = e.getDeltaX();
-            if (direction == 0) direction = e.getDeltaY();
+            if (direction < 0.1) direction = e.getDeltaY();
             Point2D trueMouseCoordinates = new Point2D(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY());
             for (Transform t : simulationInnerPane.getTransforms()) {
                 try {

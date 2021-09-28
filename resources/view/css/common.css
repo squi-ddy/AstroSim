@@ -150,3 +150,29 @@ Planet stuff
     -fx-border-color: -theme-contrast-color-1;
     -fx-border-width: 2;
 }
+
+/*
+Inspector Pane
+*/
+
+.inspector-pane-base
+{
+    -fx-border-color: -theme-color-2;
+}
+
+.inspector-pane-centre
+{
+    -fx-background-color: -theme-color-3;
+}
+
+.inspector-pane-top,
+.inspector-pane-bottom
+{
+    -fx-background-color: -theme-color-1;
+}
+
+.inspector-title,
+.inspector-property-label
+{
+    -fx-text-fill: -theme-text-color-1;
+}

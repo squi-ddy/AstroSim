@@ -120,6 +120,7 @@ public class SplashController implements Initializable {
             nodeInfo.forEach(e -> {
                 try {
                     String fileName = e.getValue();
+                    Files.createDirectories(Path.of(System.getProperty("user.dir"), "saves"));
                     Files.copy(Objects.requireNonNull(getClass().getResourceAsStream("/defaultSaves/" + fileName)), Path.of(System.getProperty("user.dir"), "saves", fileName), StandardCopyOption.REPLACE_EXISTING);
                 } catch (XMLParseException | IOException ex) {
                     ex.printStackTrace();

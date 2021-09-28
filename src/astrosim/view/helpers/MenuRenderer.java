@@ -25,7 +25,7 @@ public class MenuRenderer {
                 wrapper.getStyleClass().add("simulator-menu-dropdown-spacer");
             }
             wrapper.setOnMouseClicked(e -> item.doOnClick().run());
-            itemLabel.setFont(new Font(16));
+            itemLabel.setFont(new Font(item.name() == null ? 4 : 16));
             root.getChildren().add(wrapper);
         }
         root.getStyleClass().add("simulator-menu-dropdown");

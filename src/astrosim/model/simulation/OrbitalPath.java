@@ -6,13 +6,14 @@ import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class OrbitalPath implements XMLHashable {
     // Stores tracers.
-    private final Deque<Vector2D> positionBuffer;
-    private final Deque<Vector2D> velocityBuffer;
-    private final Deque<Vector2D> positionTrail;
-    private final Deque<Vector2D> velocityTrail;
+    private final ConcurrentLinkedDeque<Vector2D> positionBuffer;
+    private final ConcurrentLinkedDeque<Vector2D> velocityBuffer;
+    private final ConcurrentLinkedDeque<Vector2D> positionTrail;
+    private final ConcurrentLinkedDeque<Vector2D> velocityTrail;
     private static int maxLength = 0;
     private static int maxBufferLength = 0;
 
@@ -25,10 +26,10 @@ public class OrbitalPath implements XMLHashable {
     }
 
     public OrbitalPath(Vector2D position, Vector2D velocity) {
-        this.positionTrail = new ArrayDeque<>(List.of(position));
-        this.velocityTrail = new ArrayDeque<>(List.of(velocity));
-        this.positionBuffer = new ArrayDeque<>();
-        this.velocityBuffer = new ArrayDeque<>();
+        this.positionTrail = new ConcurrentLinkedDeque<>(List.of(position));
+        this.velocityTrail = new ConcurrentLinkedDeque<>(List.of(velocity));
+        this.positionBuffer = new ConcurrentLinkedDeque<>();
+        this.velocityBuffer = new ConcurrentLinkedDeque<>();
     }
 
     public void addPosition(Vector2D pos, Vector2D vel) {
@@ -59,9 +60,15 @@ public class OrbitalPath implements XMLHashable {
 
     public List<Double> getTrail() {
         List<Double> pts = new ArrayList<>();
-        for (Vector2D pos : positionTrail) {
-            pts.add(pos.getX());
-            pts.add(pos.getY());
+        Iterator<Vector2D> it = positionTrail.iterator();
+        int index = 0;
+        while (it.hasNext()) {
+            Vector2D pos = it.next();
+            if (index % 500 == 0) {
+                pts.add(pos.getX());
+                pts.add(pos.getY());
+            }
+            index++;
         }
         return pts;
     }

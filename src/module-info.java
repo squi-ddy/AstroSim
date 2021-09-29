@@ -6,6 +6,8 @@ module AstroSim {
     opens astrosim.model.simulation;
     opens astrosim.view.helpers;
     opens astrosim;
+    opens astrosim.view.nodes.inspector;
+    opens astrosim.view.nodes.menu;
     opens astrosim.view.nodes;
     requires javafx.controls;
     requires javafx.fxml;

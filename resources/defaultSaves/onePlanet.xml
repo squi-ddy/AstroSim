@@ -16,13 +16,12 @@
                     </velocity>
                 </path>
                 <static>false</static>
-                <mass>1.0E20</mass>
+                <mass>1.0E18</mass>
                 <name>Mars</name>
-                <radius>1000000.0</radius>
+                <radius>20.0</radius>
                 <color>#ff0000</color>
             </elem0>
             <size>1</size>
         </planets>
-        <valRes>1.0E10</valRes>
     </scenario>
 </astrosim>

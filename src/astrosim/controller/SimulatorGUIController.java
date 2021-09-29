@@ -2,15 +2,18 @@ package astrosim.controller;
 
 import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.Settings;
+import astrosim.model.managers.SimulatorGUIManager;
 import astrosim.model.math.Functions;
 import astrosim.model.simulation.Planet;
 import astrosim.model.simulation.Scenario;
-import astrosim.view.helpers.MenuItem;
-import astrosim.view.helpers.MenuRenderer;
-import astrosim.view.nodes.InspectorPane;
+import astrosim.view.helpers.InspectablePlanetList;
 import astrosim.view.nodes.PlanetNode;
+import astrosim.view.nodes.inspector.InspectorPane;
+import astrosim.view.nodes.menu.Menu;
+import astrosim.view.nodes.menu.MenuItem;
 import javafx.animation.Animation;
 import javafx.animation.FillTransition;
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -19,9 +22,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.NonInvertibleTransformException;
@@ -33,8 +34,13 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class SimulatorGUIController implements Initializable {
+    @FXML
+    private AnchorPane inspectorParentPane;
     @FXML
     private Label zoomLabel;
     @FXML
@@ -50,10 +56,6 @@ public class SimulatorGUIController implements Initializable {
     @FXML
     private StackPane root;
     @FXML
-    private Label objectMenuItem;
-    @FXML
-    private Label fileMenuItem;
-    @FXML
     private ToggleButton pauseButton;
     @FXML
     private ToggleButton speed1Button;
@@ -61,35 +63,57 @@ public class SimulatorGUIController implements Initializable {
     private ToggleButton speed2Button;
     @FXML
     private ToggleButton speed3Button;
+    @FXML
+    private HBox menuBar;
 
     private ToggleButton[] speedButtons;
     private Double lastX = null;
     private Double lastY = null;
     private Scale scale = new Scale();
-    private double lastScale = 1;
     private double currentScale = 1;
-    private static final double SCALE_CONSTANT = 5e4;
-    private final List<PlanetNode> planetNodes = new ArrayList<>();
-    private final InspectorPane inspector = new InspectorPane();
+    private final InspectablePlanetList planetNodes = new InspectablePlanetList();
+    private ScheduledExecutorService simulator = Executors.newSingleThreadScheduledExecutor();
+    private int toNextBurst = (int) Math.ceil(Settings.getMaxBufferInTrail() / 4.);
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         speedButtons = new ToggleButton[]{pauseButton, speed1Button, speed2Button, speed3Button};
+        for (short i = 0; i < 4; i++) {
+            short finalI = i;
+            speedButtons[i].setOnAction(e -> setSpeed(finalI));
+        }
         simulatorRoot.prefWidthProperty().bind(root.widthProperty());
         simulatorRoot.prefHeightProperty().bind(root.heightProperty());
         syncSpeedButtons();
         List<MenuItem> fileMenu = new ArrayList<>();
         List<MenuItem> objectMenu = new ArrayList<>();
+        List<MenuItem> settingsMenu = new ArrayList<>();
         fileMenu.add(new MenuItem("Save", () -> doSave(false)));
         fileMenu.add(new MenuItem("Save As", () -> doSave(true)));
         fileMenu.add(new MenuItem("Delete", this::doDelete));
         objectMenu.add(new MenuItem("Create new Planet", this::newPlanet));
         objectMenu.add(MenuItem.SPACING);
-        objectMenu.add(new MenuItem("Planet Inspector", this::openInspector));
-        MenuRenderer.renderMenu(fileMenu, fileMenuItem, root);
-        MenuRenderer.renderMenu(objectMenu, objectMenuItem, root);
-        simulatorRoot.setRight(inspector);
+        objectMenu.add(new MenuItem("See all Planets", this::zoomOnPlanetPane));
+        settingsMenu.add(new MenuItem("Global", this::globalSettings));
+        settingsMenu.add(new MenuItem("Simulation", this::simulationSettings));
+        menuBar.getChildren().addAll(
+                new Menu("Files", fileMenu, root),
+                new Menu("Objects", objectMenu, root),
+                new Menu("Settings", settingsMenu, root)
+        );
         setUpSimulator();
+        SimulatorGUIManager.setController(this);
+        InspectorPane inspector = SimulatorGUIManager.getInspector();
+        AnchorPane.setTopAnchor(inspector, 0.);
+        AnchorPane.setRightAnchor(inspector, 0.);
+        AnchorPane.setBottomAnchor(inspector, 0.);
+        inspectorParentPane.getChildren().add(inspector);
+    }
+
+    private void simulationSettings() {
+    }
+
+    private void globalSettings() {
     }
 
     private void doSave(boolean saveAs) {
@@ -101,14 +125,39 @@ public class SimulatorGUIController implements Initializable {
     }
 
     private void newPlanet() {
-
+        Planet planet = new Planet();
+        ScenarioManager.getScenario().getPlanets().add(planet);
+        placePlanet(planet);
+        ScenarioManager.getScenario().startThread();
     }
 
-    private void openInspector() {
+    private void setSpeed(short speedLevel) {
+        Settings.setSpeed(speedLevel);
+        SimulatorGUIManager.getInspector().hidePane();
+        simulator = Executors.newSingleThreadScheduledExecutor();
+        syncSpeedButtons();
+        Runnable toExecute = () -> {
+            planetNodes.getPlanetList().forEach(p -> {
+                p.getPlanet().getPath().addToTrail(1);
+                Platform.runLater(p::updatePlanet);
+            });
+            toNextBurst--;
+            if (toNextBurst <= 0) {
+                ScenarioManager.getScenario().simulateSteps((int) Math.ceil(Settings.getMaxBufferInTrail() / 4.) + 10);
+                toNextBurst = (int) Math.ceil(Settings.getMaxBufferInTrail() / 4.);
+            }
+        };
+        if (speedLevel != 0) simulator.scheduleAtFixedRate(toExecute, 0, 300 / speedLevel, TimeUnit.MICROSECONDS);
+        else simulator.shutdownNow();
+    }
+
+    private void zoomOnPlanetPane() {
+        InspectorPane inspector = SimulatorGUIManager.getInspector("Planets");
+        inspector.loadSettings(planetNodes);
         inspector.showPane();
     }
 
-    private void syncSpeedButtons() {
+    public void syncSpeedButtons() {
         for (int i = 0; i < speedButtons.length; i++) {
             speedButtons[i].setSelected(Settings.getSpeed() == i);
         }
@@ -132,28 +181,17 @@ public class SimulatorGUIController implements Initializable {
         });
         simulationPane.setOnMouseMoved(e -> {
             if (simulationInnerPane.getTransforms().size() > 1) combineTransforms();
-            try {
-                Point2D trueMouseCoordinates = simulationInnerPane.getTransforms().get(0).inverseTransform(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY());
-                xLabel.setText(String.valueOf((int) (trueMouseCoordinates.getX())));
-                yLabel.setText(String.valueOf((int) (trueMouseCoordinates.getY())));
-            } catch (NonInvertibleTransformException ex) {
-                ex.printStackTrace();
-            }
+            Point2D trueMouseCoordinates = invertTransforms(new Point2D(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY()));
+            xLabel.setText(String.valueOf((int) (trueMouseCoordinates.getX())));
+            yLabel.setText(String.valueOf((int) (trueMouseCoordinates.getY())));
         });
         simulationPane.setOnScrollStarted(e -> simulationInnerPane.getTransforms().add(scale));
         simulationPane.setOnScroll(e -> {
             if (!simulationInnerPane.getTransforms().contains(scale)) simulationInnerPane.getTransforms().add(scale);
-            double direction = e.getDeltaX();
-            if (direction < 0.1) direction = e.getDeltaY();
-            Point2D trueMouseCoordinates = new Point2D(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY());
-            for (Transform t : simulationInnerPane.getTransforms()) {
-                try {
-                    trueMouseCoordinates = t.inverseTransform(trueMouseCoordinates);
-                } catch (NonInvertibleTransformException ex) {
-                    ex.printStackTrace();
-                }
-            }
-            scaleScenario(direction * Settings.getSensitivity() / 100000, trueMouseCoordinates.getX(), trueMouseCoordinates.getY());
+            double direction = e.getDeltaX() * e.getMultiplierX();
+            if (direction == 0) direction = -e.getDeltaY() * e.getMultiplierY();
+            Point2D trueMouseCoordinates = invertTransforms(new Point2D(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY()));
+            scaleScenario(direction * Settings.getSensitivity() / 2500000, trueMouseCoordinates.getX(), trueMouseCoordinates.getY());
         });
         simulationPane.setOnScrollFinished(e -> combineTransforms());
         doSimulatorClip();
@@ -163,9 +201,14 @@ public class SimulatorGUIController implements Initializable {
     }
 
     private void scaleScenario(double deltaPercent, double scaleFromX, double scaleFromY) {
-        double scaleBy = (lastScale - deltaPercent) / currentScale;
-        lastScale = Math.max(0.1, currentScale * scaleBy);
-        zoomLabel.setText(String.valueOf(Math.round(lastScale * 100)));
+        if (scaleFromX != scale.getPivotX() || scaleFromY != scale.getPivotY()) {
+            combineTransforms();
+            simulationInnerPane.getTransforms().add(scale);
+        }
+        double scaleBy = Math.max(currentScale * scale.getX() - deltaPercent, 0.01) / currentScale;
+        SimulatorGUIManager.scaleProperty().set(currentScale * scaleBy);
+        long zoom = Math.round(currentScale * scaleBy * 1000);
+        zoomLabel.setText(String.valueOf(zoom / 10) + '.' + zoom % 10);
         scale.setPivotX(scaleFromX);
         scale.setPivotY(scaleFromY);
         scale.setX(scaleBy);
@@ -178,8 +221,8 @@ public class SimulatorGUIController implements Initializable {
     }
 
     private void placePlanet(Planet planet) {
-        PlanetNode node = new PlanetNode(planet, SCALE_CONSTANT);
-        planetNodes.add(node);
+        PlanetNode node = new PlanetNode(planet);
+        planetNodes.getPlanetList().add(node);
         simulationInnerPane.getChildren().add(node);
     }
 
@@ -219,11 +262,9 @@ public class SimulatorGUIController implements Initializable {
         simulationPane.getChildren().add(0, speckleGroup);
     }
 
-    private void syncTransforms() {
-
-    }
-
     private void combineTransforms() {
+        currentScale *= scale.getX();
+        scale = new Scale();
         Transform transform = null;
         for (Transform t : simulationInnerPane.getTransforms()) {
             if (transform == null) {
@@ -235,8 +276,35 @@ public class SimulatorGUIController implements Initializable {
         }
         simulationInnerPane.getTransforms().clear();
         simulationInnerPane.getTransforms().add(transform);
-        syncTransforms();
-        currentScale *= scale.getX();
-        scale = new Scale();
+    }
+
+    public void moveTo(Planet planet) {
+        Point2D coordinates = applyTransforms(planet.getPosition().toPoint2D());
+        simulationInnerPane.setLayoutX(simulationPane.getWidth() / 2 - coordinates.getX());
+        simulationInnerPane.setLayoutY(simulationPane.getHeight() / 2 - coordinates.getY());
+        // Scale for the new planet to fit exactly 10% of scenario space
+        double zoom = 0.05 * Math.min(simulationPane.getWidth(), simulationPane.getHeight()) / planet.getRadius();
+        combineTransforms();
+        scale.setPivotX(planet.getPosition().getX() + 1);
+        scale.setPivotY(planet.getPosition().getY() + 1);
+        scaleScenario(scale.getX() * currentScale - zoom, planet.getPosition().getX(), planet.getPosition().getY());
+    }
+
+    public Point2D invertTransforms(Point2D coordinates) {
+        for (Transform t : simulationInnerPane.getTransforms()) {
+            try {
+                coordinates = t.inverseTransform(coordinates);
+            } catch (NonInvertibleTransformException ex) {
+                ex.printStackTrace();
+            }
+        }
+        return coordinates;
+    }
+
+    public Point2D applyTransforms(Point2D coordinates) {
+        for (Transform t : simulationInnerPane.getTransforms()) {
+            coordinates = t.transform(coordinates);
+        }
+        return coordinates;
     }
 }

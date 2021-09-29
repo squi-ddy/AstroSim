@@ -85,6 +85,7 @@ public class ScenarioManager {
             stage.setScene(scene);
             stage.setTitle("AstroSim");
             Platform.runLater(toHide::hide);
+            SimulatorGUIManager.getInspector().hidePane();
             stage.showAndWait();
         } catch (IOException e) {
             e.printStackTrace();

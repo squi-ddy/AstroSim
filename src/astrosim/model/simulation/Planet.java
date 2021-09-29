@@ -5,7 +5,6 @@ import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
 
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
@@ -18,6 +17,7 @@ public class Planet implements XMLHashable {
     private double radius;
     private final OrbitalPath path;
     private String color;
+    private Runnable updateListener;
 
     private static final char[] converter = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
 
@@ -41,7 +41,7 @@ public class Planet implements XMLHashable {
     }
 
     public Planet() {
-        this(new Vector2D(), new Vector2D(), 1e20, 1e6, false, "Planet", getRandomColor());
+        this(new Vector2D(), new Vector2D(), 1e18, 20, false, "Planet", getRandomColor());
     }
 
     public double getMass() {
@@ -66,32 +66,42 @@ public class Planet implements XMLHashable {
         return color;
     }
 
-    public void setColor(String color) {
-        this.color = color;
-    }
-
     public boolean isStatic() {
         return isStatic;
     }
 
+    public void setColor(String color) {
+        this.color = color;
+        updateListener.run();
+    }
+
     public void setMass(double mass) {
         this.mass = mass;
+        updateListener.run();
     }
 
     public void setPosition(Vector2D position, Vector2D velocity) {
         path.setPosition(position, velocity);
+        updateListener.run();
     }
 
     public void setRadius(double radius) {
         this.radius = radius;
+        updateListener.run();
     }
 
     public void setStatic(boolean aStatic) {
         isStatic = aStatic;
+        updateListener.run();
     }
 
     public void setName(String name) {
         this.name = name;
+        updateListener.run();
+    }
+
+    public void setUpdateListener(Runnable updateListener) {
+        this.updateListener = updateListener;
     }
 
     public String getName() {
@@ -124,5 +134,4 @@ public class Planet implements XMLHashable {
             throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
     }
-
 }

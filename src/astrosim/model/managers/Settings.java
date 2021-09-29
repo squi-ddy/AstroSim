@@ -17,8 +17,8 @@ public class Settings {
     private static short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines time step
     private static String lastSave = null; // file path to last save; provides smoothness
     private static short speed = 1; // The speed of the simulation
-    private static int maxPointsInTrail = 150;
-    private static int maxBufferInTrail = 150;
+    private static int maxPointsInTrail = 10000;
+    private static int maxBufferInTrail = 3000;
     private static boolean darkMode = true;
     private static int sensitivity = 100;
 

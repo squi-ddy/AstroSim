@@ -16,12 +16,15 @@ SaveChooser ScrollPane css stuff
     -fx-background-color: transparent;
 }
 
-.save-chooser {
+.save-chooser,
+.save-chooser:focused
+{
     -fx-background-color: -theme-color-3;
     -fx-background-radius: 5;
     -fx-border-color: -theme-color-2;
     -fx-border-radius: 5;
     -fx-padding: 5;
+    -fx-background-insets: 0 0 0 0;
 }
 
 .save-chooser > .scroll-bar:vertical {
@@ -107,12 +110,16 @@ Menu buttons on top bar of simulator screen
 {
     -fx-background-color: derive(-theme-color-1, 50%);
     -fx-text-fill: -theme-text-color-1;
+    -fx-padding: 2 5 2 5;
+    -fx-font-size: 16;
 }
 
 .simulator-menu
 {
     -fx-background-color: -theme-color-1;
     -fx-text-fill: -theme-text-color-2;
+    -fx-padding: 2 5 2 5;
+    -fx-font-size: 16;
 }
 
 .simulator-menu-dropdown
@@ -121,34 +128,31 @@ Menu buttons on top bar of simulator screen
     -fx-border-color: -theme-color-2;
 }
 
-.simulator-menu-dropdown-label,
-.simulator-menu-dropdown-spacer
+.simulator-menu-dropdown-label
 {
     -fx-background-color: -theme-color-1;
     -fx-padding: 1 5 1 5;
 }
 
-.simulator-menu-dropdown-label > .label {
+.simulator-menu-dropdown-label > .label
+{
+    -fx-font-size: 16;
     -fx-text-fill: -theme-text-color-2;
+}
+
+.simulator-menu-dropdown-spacer
+{
+    -fx-font-size: 8;
 }
 
 .simulator-menu-dropdown-label:hover
 {
     -fx-background-color: derive(-theme-color-1, 50%);
+    -fx-padding: 1 5 1 5;
 }
 
 .simulator-menu-dropdown-label:hover > .label {
     -fx-text-fill: -theme-text-color-1;
-}
-
-/*
-Planet stuff
-*/
-
-.planet-selected
-{
-    -fx-border-color: -theme-contrast-color-1;
-    -fx-border-width: 2;
 }
 
 /*
@@ -158,13 +162,6 @@ Inspector Pane
 .inspector-pane-base
 {
     -fx-border-color: -theme-color-2;
-}
-
-.inspector-pane-centre
-{
-    -fx-background-color: -theme-color-3;
-    -fx-border-color: -theme-color-2;
-    -fx-border-width: 0 1 0 1;
 }
 
 .inspector-pane-top,
@@ -177,4 +174,76 @@ Inspector Pane
 .inspector-property-label
 {
     -fx-text-fill: -theme-text-color-1;
+    -fx-background-insets: 0;
+}
+
+.inspector-property-label-changed
+{
+    -fx-font-style: italic;
+    -fx-text-fill: -theme-change-color;
+}
+
+.inspector-property-label-invalid
+{
+    -fx-font-style: italic;
+    -fx-text-fill: -theme-error-color;
+}
+
+.inspector-pane-centre > .viewport,
+.inspector-pane-centre > .scroll-bar
+{
+    -fx-background-color: transparent;
+}
+
+.inspector-pane-centre,
+.inspector-pane-centre:focused
+{
+    -fx-background-color: -theme-color-3;
+    -fx-border-color: -theme-color-2;
+    -fx-border-width: 1 0 1 0;
+    -fx-background-insets: 0 0 0 0;
+    -fx-background-radius: 0;
+    -fx-padding: 5;
+}
+
+.inspector-pane-centre > .scroll-bar:vertical {
+    -fx-padding: 2 0 2 0;
+    -fx-scale-x: 0.9;
+}
+
+.inspector-pane-centre > .scroll-bar > .decrement-button > .decrement-arrow,
+.inspector-pane-centre > .scroll-bar > .increment-button > .increment-arrow
+{
+    -fx-scale-x: 0.85;
+    -fx-scale-y: 0.85;
+    -fx-background-color: -theme-color-2;
+}
+
+.inspector-pane-centre > .scroll-bar:horizontal {
+    -fx-padding: 0 2 0 2;
+    -fx-scale-y: 0.9;
+}
+
+.inspector-pane-centre > .scroll-bar > .thumb {
+    -fx-background-color: -theme-color-2;
+}
+
+/*
+Themed text field
+*/
+
+.themed-text-field
+{
+    -fx-background-color: -theme-color-1;
+    -fx-border-color: -theme-color-2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-text-fill: -theme-text-color-1;
+}
+
+.themed-text-field:focused
+{
+    -fx-background-color: -theme-color-1;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
 }

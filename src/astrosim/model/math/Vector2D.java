@@ -3,6 +3,7 @@ package astrosim.model.math;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
+import javafx.geometry.Point2D;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,9 +12,10 @@ public class Vector2D implements XMLHashable {
     private final double x;
     private final double y;
 
+    public static final Vector2D EMPTY = new Vector2D();
+
     public Vector2D() {
-        this.x = 0;
-        this.y = 0;
+        this(0, 0);
     }
 
     public Vector2D(double x, double y) {
@@ -53,6 +55,10 @@ public class Vector2D implements XMLHashable {
         return y;
     }
 
+    public Point2D toPoint2D() {
+        return new Point2D(x, y);
+    }
+
     @Override
     public XMLNodeInfo hashed() {
         HashMap<String, XMLNodeInfo> hashed = new HashMap<>();
@@ -75,5 +81,18 @@ public class Vector2D implements XMLHashable {
     @Override
     public String toString() {
         return "(" + x + ", " + y + ")";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Vector2D other) {
+            return other.getX() == this.x && other.getY() == this.y;
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) Math.round(x * y);
     }
 }

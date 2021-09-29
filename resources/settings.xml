@@ -5,8 +5,8 @@
         <accuracy>10</accuracy>
         <lastSave>firstTime</lastSave>
         <speed>0</speed>
-        <bufferLen>150</bufferLen>
-        <trailLen>150</trailLen>
+        <bufferLen>3000</bufferLen>
+        <trailLen>5000</trailLen>
         <sensitivity>100</sensitivity>
     </settings>
 </astrosim>

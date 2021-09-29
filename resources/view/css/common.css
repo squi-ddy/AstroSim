@@ -163,6 +163,8 @@ Inspector Pane
 .inspector-pane-centre
 {
     -fx-background-color: -theme-color-3;
+    -fx-border-color: -theme-color-2;
+    -fx-border-width: 0 1 0 1;
 }
 
 .inspector-pane-top,

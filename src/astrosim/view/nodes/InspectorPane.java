@@ -32,13 +32,13 @@ public class InspectorPane extends BorderPane {
         Button applyButton = new Button();
         applyButton.setGraphic(icon);
         applyButton.getStyleClass().add("themed-button");
-        HBox.setMargin(applyButton, new Insets(5));
+        HBox.setMargin(applyButton, new Insets(1));
         HBox wrapper = new HBox(applyButton);
         wrapper.setAlignment(Pos.CENTER_RIGHT);
         super.setBottom(wrapper);
         Label title = new Label("Properties");
         title.setFont(new Font(16));
-        HBox.setMargin(title, new Insets(5));
+        HBox.setMargin(title, new Insets(1));
         Button closeInspector = new Button();
         SVGPath xSymbolShape = new SVGPath();
         xSymbolShape.setContent("M 5 5 L -5 -5 M -5 5 L 5 -5");
@@ -48,7 +48,7 @@ public class InspectorPane extends BorderPane {
         closeInspector.setOnAction(e -> {
             hidePane();
         });
-        HBox.setMargin(closeInspector, new Insets(5));
+        HBox.setMargin(closeInspector, new Insets(1));
         StackPane topWrapper = new StackPane();
         HBox titleWrapper = new HBox(title);
         titleWrapper.setAlignment(Pos.CENTER);

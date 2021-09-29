@@ -164,7 +164,7 @@ public class SimulatorGUIController implements Initializable {
 
     private void scaleScenario(double deltaPercent, double scaleFromX, double scaleFromY) {
         double scaleBy = (lastScale - deltaPercent) / currentScale;
-        lastScale = Math.max(0.05, currentScale * scaleBy);
+        lastScale = Math.max(0.1, currentScale * scaleBy);
         zoomLabel.setText(String.valueOf(Math.round(lastScale * 100)));
         scale.setPivotX(scaleFromX);
         scale.setPivotY(scaleFromY);

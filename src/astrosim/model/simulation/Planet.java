@@ -32,6 +32,7 @@ public class Planet implements XMLHashable {
         return "#" + result;
     }
 
+    @SuppressWarnings("java:S107")
     public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic, String name, String color, String trailColor) {
         this.mass = mass;
         this.radius = radius;

@@ -247,3 +247,34 @@ Themed text field
     -fx-background-insets: 0;
     -fx-background-radius: 0;
 }
+
+/*
+Themed check box
+*/
+
+.themed-check-box > .box
+{
+    -fx-background-color: -theme-color-1;
+    -fx-border-color: -theme-color-2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 5;
+}
+
+.themed-check-box:focused > .box
+{
+    -fx-background-color: -theme-color-1;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.themed-check-box > .box > .mark
+{
+    -fx-stroke-width: 2.5;
+    -fx-stroke-line-cap: round;
+}
+
+.themed-check-box:selected > .box > .mark
+{
+    -fx-background-color: -theme-text-color-1;
+}

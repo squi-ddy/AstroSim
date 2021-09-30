@@ -28,6 +28,10 @@ public class SimulatorGUIManager {
         return inspector;
     }
 
+    public static InspectorPane getOpenInspector() {
+        return inspector;
+    }
+
     public static DoubleProperty scaleProperty() {
         return currentScale;
     }

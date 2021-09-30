@@ -1,14 +1,19 @@
 package astrosim.controller;
 
+import astrosim.Main;
 import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.SettingsManager;
 import astrosim.model.managers.SimulatorGUIManager;
 import astrosim.model.math.Functions;
+import astrosim.model.math.Vector2D;
 import astrosim.model.simulation.Planet;
 import astrosim.model.simulation.Scenario;
 import astrosim.view.helpers.InspectablePlanetList;
 import astrosim.view.nodes.PlanetNode;
+import astrosim.view.nodes.inspector.Inspectable;
 import astrosim.view.nodes.inspector.InspectorPane;
+import astrosim.view.nodes.inspector.InspectorSetting;
+import astrosim.view.nodes.inspector.StringInspectorSetting;
 import astrosim.view.nodes.menu.Menu;
 import astrosim.view.nodes.menu.MenuItem;
 import javafx.animation.Animation;
@@ -28,12 +33,12 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.NonInvertibleTransformException;
 import javafx.scene.transform.Scale;
 import javafx.scene.transform.Transform;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -74,15 +79,15 @@ public class SimulatorGUIController implements Initializable {
     private double currentScale = 1;
     private final InspectablePlanetList planetNodes = new InspectablePlanetList();
     private ScheduledExecutorService simulator = Executors.newSingleThreadScheduledExecutor();
-    private static final int BURST_STEPS = (int) Math.ceil(SettingsManager.getMaxBufferInTrail() / 4.);
-    private Stage stage;
+    private int burstSteps = (int) Math.ceil(SettingsManager.getGlobalSettings().getMaxBufferInTrail() / SettingsManager.getGlobalSettings().getBurstFactor());
+    private final int[] speedValues = new int[]{0, 1, 3, 9};
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         speedButtons = new ToggleButton[]{pauseButton, speed1Button, speed2Button, speed3Button};
         for (int i = 0; i < 4; i++) {
             int finalI = i;
-            speedButtons[i].setOnAction(e -> setSpeed(finalI));
+            speedButtons[i].setOnAction(e -> setSpeed(speedValues[finalI]));
         }
         simulatorRoot.prefWidthProperty().bind(root.widthProperty());
         simulatorRoot.prefHeightProperty().bind(root.heightProperty());
@@ -97,7 +102,7 @@ public class SimulatorGUIController implements Initializable {
         objectMenu.add(MenuItem.SPACING);
         objectMenu.add(new MenuItem("See all Planets", this::zoomOnPlanetPane));
         settingsMenu.add(new MenuItem("Global", this::globalSettings));
-        settingsMenu.add(new MenuItem("Simulation", this::simulationSettings));
+        settingsMenu.add(new MenuItem("Scenario", this::simulationSettings));
         menuBar.getChildren().addAll(
                 new Menu("Files", fileMenu, root),
                 new Menu("Objects", objectMenu, root),
@@ -113,46 +118,88 @@ public class SimulatorGUIController implements Initializable {
     }
 
     private void simulationSettings() {
+        SimulatorGUIManager.getInspector("Properties").loadSettings(ScenarioManager.getScenario());
     }
 
     private void globalSettings() {
+        SimulatorGUIManager.getInspector("Properties").loadSettings(SettingsManager.getGlobalSettings());
     }
 
     private void doSave(boolean saveAs) {
+        if (!saveAs && SettingsManager.getGlobalSettings().getLastSave() != null && SettingsManager.getGlobalSettings().getLastSave().contains("xml")) ScenarioManager.save(SettingsManager.getGlobalSettings().getLastSave());
+        else {
+            SimulatorGUIManager.getInspector("Save").loadSettings(new Inspectable() {
+                private final String fileName = SettingsManager.getGlobalSettings().getLastSave();
 
+                private void saveFile(String name) {
+                    ScenarioManager.save(name);
+                }
+
+                @Override
+                public List<InspectorSetting<?>> getSettings() {
+                    List<InspectorSetting<?>> settings = new ArrayList<>();
+                    settings.add(new StringInspectorSetting("File Name", fileName != null && fileName.contains("xml") ? fileName : "", this::saveFile, s -> s.matches("[a-zA-Z][a-zA-Z0-9-_]*\\.xml")));
+                    return settings;
+                }
+
+                @Override
+                public void onClose() {
+                    // nothing
+                }
+            });
+        }
     }
 
     private void doDelete() {
-
+        if (SettingsManager.getGlobalSettings().getLastSave().contains("xml")) {
+            new Thread(() -> ScenarioManager.deleteScenario(SettingsManager.getGlobalSettings().getLastSave())).start();
+            root.getScene().getWindow().hide();
+        }
     }
 
     private void newPlanet() {
         Planet planet = new Planet();
         setSpeed(0);
-        ScenarioManager.getScenario().stopThread();
+        ScenarioManager.getScenario().stopThreadNow();
         ScenarioManager.getScenario().getPlanets().add(planet);
         placePlanet(planet);
         ScenarioManager.getScenario().startThread();
     }
 
+    public void deletePlanet(PlanetNode node) {
+        setSpeed(0);
+        ScenarioManager.getScenario().stopThreadNow();
+        ScenarioManager.getScenario().getPlanets().remove(node.getPlanet());
+        simulationInnerPane.getChildren().remove(node);
+        planetNodes.getPlanetList().remove(node);
+        ScenarioManager.getScenario().startThread();
+    }
+
+    private void runSimulationGUI() {
+        ScenarioManager.getScenario().stopThread();
+        planetNodes.getPlanetList().forEach(p -> {
+            if (!p.getPlanet().isStatic()) p.getPlanet().getPath().addToTrail(burstSteps);
+            List<Vector2D> trail = p.getPlanet().getPath().getTrail();
+            Platform.runLater(() -> p.updatePlanet(trail, p.getPlanet().getPath().getTrailLength()));
+        });
+        ScenarioManager.getScenario().simulateSteps(burstSteps + 10);
+    }
+
     public void setSpeed(int speedLevel) {
-        SettingsManager.setSpeed((short) speedLevel);
-        SimulatorGUIManager.getInspector().hidePane();
-        syncSpeedButtons();
-        Runnable toExecute = () -> {
-            planetNodes.getPlanetList().forEach(p -> {
-                System.out.println("update");
-                p.getPlanet().getPath().addToTrail(BURST_STEPS);
-                List<Double> trail = p.getPlanet().getPath().getTrail();
-                Platform.runLater(() -> p.updatePlanet(trail));
-            });
-            ScenarioManager.getScenario().simulateSteps(BURST_STEPS + 10);
-        };
-        simulator.shutdown();
+        SettingsManager.getGlobalSettings().setSpeed(speedLevel);
+        if (speedLevel != 0) SimulatorGUIManager.getInspector().hidePane();
+        simulator.shutdownNow();
+        try {
+            boolean status = simulator.awaitTermination(1000, TimeUnit.SECONDS);
+            if (!status) throw new IllegalStateException();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
         if (speedLevel != 0) {
             simulator = Executors.newSingleThreadScheduledExecutor();
-            simulator.scheduleAtFixedRate(toExecute, 0, (long) 90 / speedLevel * BURST_STEPS, TimeUnit.MICROSECONDS);
+            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) 300 / speedLevel * burstSteps, TimeUnit.MICROSECONDS);
         }
+        syncSpeedButtons();
     }
 
     private void zoomOnPlanetPane() {
@@ -163,7 +210,7 @@ public class SimulatorGUIController implements Initializable {
 
     public void syncSpeedButtons() {
         for (int i = 0; i < speedButtons.length; i++) {
-            speedButtons[i].setSelected(SettingsManager.getSpeed() == i);
+            speedButtons[i].setSelected(SettingsManager.getGlobalSettings().getSpeed() == speedValues[i]);
         }
     }
 
@@ -195,7 +242,7 @@ public class SimulatorGUIController implements Initializable {
             double direction = e.getDeltaX() * e.getMultiplierX();
             if (direction == 0) direction = -e.getDeltaY() * e.getMultiplierY();
             Point2D trueMouseCoordinates = invertTransforms(new Point2D(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY()));
-            scaleScenario(direction * SettingsManager.getSensitivity() / 2500000, trueMouseCoordinates.getX(), trueMouseCoordinates.getY());
+            scaleScenario(direction * SettingsManager.getGlobalSettings().getSensitivity() / 2500000, trueMouseCoordinates.getX(), trueMouseCoordinates.getY());
         });
         simulationPane.setOnScrollFinished(e -> combineTransforms());
         doSimulatorClip();
@@ -312,10 +359,17 @@ public class SimulatorGUIController implements Initializable {
         return coordinates;
     }
 
-    public void setStage(Stage stage) {
-        this.stage = stage;
-        stage.setOnCloseRequest(e -> {
-            // todo
-        });
+    public void setBurstFactor(double burstFactor) {
+        this.burstSteps = (int) Math.ceil(SettingsManager.getGlobalSettings().getMaxBufferInTrail() / burstFactor);
+    }
+
+    public void setDarkMode(boolean darkMode) {
+        if (darkMode) {
+            root.getStylesheets().removeIf(s -> s.contains("light"));
+        } else {
+            root.getStylesheets().removeIf(s -> s.contains("dark"));
+        }
+        root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (darkMode ? "dark.css" : "light.css"))).toExternalForm());
+
     }
 }

@@ -25,7 +25,7 @@ public class ScenarioManager {
     private ScenarioManager() {}
 
     static {
-        String lastSave = SettingsManager.getLastSave();
+        String lastSave = SettingsManager.getGlobalSettings().getLastSave();
         if (lastSave != null && lastSave.matches(".+\\.xml")) {
             try {
                 parser = new XMLParser(ResourceManager.getPath("saves/" + lastSave));
@@ -48,19 +48,21 @@ public class ScenarioManager {
     public static void deleteScenario(String name) {
         try {
             Files.delete(ResourceManager.getPath("saves/" + name));
-            SettingsManager.setLastSave(null);
+            SettingsManager.getGlobalSettings().setLastSave(null);
+            scenario = null;
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     public static void makeScenario() {
-        ScenarioManager.scenario = new Scenario();
+        scenario = new Scenario();
+        SettingsManager.getGlobalSettings().setLastSave(null);
     }
 
     public static void loadScenario(String name) {
         try {
-            SettingsManager.setLastSave(name);
+            SettingsManager.getGlobalSettings().setLastSave(name);
             parser = new XMLParser(ResourceManager.getPath("saves/" + name));
             scenario = Scenario.fromXML(parser.getContent().get("scenario"));
         } catch (XMLParseException e) {
@@ -68,33 +70,42 @@ public class ScenarioManager {
         }
     }
 
-    public static void softSave(String fileName) throws XMLParseException {
-        Path result = ResourceManager.guaranteeExists("saves/" + fileName, "/defaultSave.xml");
-        parser = new XMLParser(result);
-        parser.writeContent(new String[]{"scenario"}, scenario.hashed());
-        SettingsManager.setLastSave(fileName);
+    public static void save(String fileName) {
+        try {
+            Path result = ResourceManager.guaranteeExists("saves/" + fileName, "/defaultSave.xml");
+            parser = new XMLParser(result);
+            parser.writeContent(new String[]{"scenario"}, scenario.hashed());
+            SettingsManager.getGlobalSettings().setLastSave(fileName);
+            new Thread(() -> {
+                try {
+                    parser.saveXML();
+                } catch (XMLParseException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        } catch (XMLParseException e) {
+            e.printStackTrace();
+        }
     }
 
     public static void renderScenario(Stage toHide) {
         try {
             Stage stage = new Stage();
             Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/view/fxml/simulator.fxml")));
-            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.getGlobalSettings().isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
             Scene scene = new Scene(root);
             stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
             stage.setScene(scene);
             stage.setTitle("AstroSim");
             Platform.runLater(toHide::hide);
             SimulatorGUIManager.getInspector().hidePane();
-            SimulatorGUIManager.getController().setStage(stage);
             stage.showAndWait();
             SimulatorGUIManager.getController().setSpeed(0);
+            SimulatorGUIManager.scaleProperty().set(1);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-
-    public static void save() throws XMLParseException {parser.saveXML();}
 
     public static boolean waitUntilInit() {
         return scenario != null;

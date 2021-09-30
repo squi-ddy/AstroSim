@@ -5,7 +5,9 @@
         <accuracy>10</accuracy>
         <lastSave>firstTime</lastSave>
         <bufferLen>3000</bufferLen>
-        <trailLen>5000</trailLen>
+        <trailLen>150</trailLen>
+        <positionGap>500</positionGap>
         <sensitivity>100</sensitivity>
+        <burstFactor>32</burstFactor>
     </settings>
 </astrosim>

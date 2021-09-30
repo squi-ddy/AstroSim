@@ -32,6 +32,8 @@ public class Vector2DInspectorSetting extends InspectorSetting<Vector2D> {
         this.toDisplay.setAlignment(Pos.BASELINE_CENTER);
         this.entryFieldX.getStyleClass().add("themed-text-field");
         this.entryFieldY.getStyleClass().add("themed-text-field");
+        this.entryFieldY.setPrefWidth(150);
+        this.entryFieldX.setPrefWidth(150);
         this.toDisplay.add(this.entryFieldX, 1, 0);
         this.toDisplay.add(this.entryFieldY, 1, 1);
         Label xLabel = new Label("X");

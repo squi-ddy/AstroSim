@@ -26,30 +26,11 @@ public class Simulator implements Runnable {
 
     @Override
     public void run() {
-        double tStep = 0.001 * (11 - SettingsManager.getAccuracy()) / 10;
+        double tStep = 0.001 * (11 - SettingsManager.getGlobalSettings().getAccuracy()) / 10;
         for (int i = 0; i < steps && !Thread.interrupted(); i++) {
             for (Planet p1 : planets) {
                 if (p1.isStatic()) continue;
-                Vector2D accel = new Vector2D();
-                List<Planet> intersect = new ArrayList<>();
-                for (Planet p2 : planets) {
-                    if (p1 == p2) continue;
-                    Vector2D r = p1.getPath().getLatestPosition().sub(p2.getPath().getLatestPosition());
-                    double dist = r.magnitude();
-                    if (dist - p1.getRadius() - p2.getRadius() <= 0) {
-                        intersect.add(p2);
-                    } else {
-                        accel = accel.add(accelG(p2, r));
-                    }
-                }
-                Vector2D velocity = p1.getPath().getLatestVelocity();
-                Pair<Vector2D, Vector2D> vectors = handleIntersects(p1, intersect, velocity, accel);
-                velocity = vectors.getKey();
-                accel = vectors.getValue();
-                OrbitalPath path = p1.getPath();
-                Vector2D position = path.getLatestPosition().add(path.getLatestVelocity().multiply(tStep)).add(accel.multiply(0.5 * tStep * tStep));
-                velocity = velocity.add(accel.multiply(tStep));
-                path.addPosition(position, velocity);
+                updatePath(p1, tStep);
             }
         }
     }
@@ -70,5 +51,28 @@ public class Simulator implements Runnable {
             velocity = velocity.sub(r.normalise().multiply(velocity.dot(r.normalise()) + 5 * (p1.getRadius() + p2.getRadius() - r.magnitude())));
         }
         return new Pair<>(velocity, accel);
+    }
+
+    private void updatePath(Planet p1, double tStep) {
+        Vector2D accel = new Vector2D();
+        List<Planet> intersect = new ArrayList<>();
+        for (Planet p2 : planets) {
+            if (p1 == p2) continue;
+            Vector2D r = p1.getPath().getLatestPosition().sub(p2.getPath().getLatestPosition());
+            double dist = r.magnitude();
+            if (dist - p1.getRadius() - p2.getRadius() <= 0) {
+                intersect.add(p2);
+            } else {
+                accel = accel.add(accelG(p2, r));
+            }
+        }
+        Vector2D velocity = p1.getPath().getLatestVelocity();
+        Pair<Vector2D, Vector2D> vectors = handleIntersects(p1, intersect, velocity, accel);
+        velocity = vectors.getKey();
+        accel = vectors.getValue();
+        OrbitalPath path = p1.getPath();
+        Vector2D position = path.getLatestPosition().add(path.getLatestVelocity().multiply(tStep)).add(accel.multiply(0.5 * tStep * tStep));
+        velocity = velocity.add(accel.multiply(tStep));
+        path.addPosition(position, velocity);
     }
 }

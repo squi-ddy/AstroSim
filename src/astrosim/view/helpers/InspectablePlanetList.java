@@ -22,7 +22,7 @@ public class InspectablePlanetList implements Inspectable {
     @Override
     public List<InspectorSetting<?>> getSettings() {
         List<InspectorSetting<?>> settings = new ArrayList<>();
-        planetList.forEach(p -> settings.add(new PlanetInspectorSetting(p.getPlanet().getName(), p.getPlanet())));
+        planetList.forEach(p -> settings.add(new PlanetInspectorSetting(p.getPlanet().getName(), p)));
         return settings;
     }
 

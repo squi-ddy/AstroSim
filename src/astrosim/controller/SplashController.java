@@ -65,38 +65,38 @@ public class SplashController implements Initializable {
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void loadFile() {
-        if (SettingsManager.getLastSave() != null && !SettingsManager.getLastSave().equals("firstTime")) {
+        if (SettingsManager.getGlobalSettings().getLastSave() != null && !SettingsManager.getGlobalSettings().getLastSave().equals("firstTime")) {
             statusLabel.setText("Loading save...");
             new Thread(() -> {
                 if (ScenarioManager.waitUntilInit()) {
                     Platform.runLater(() -> {
                         statusFlash.stop();
-                        ScenarioManager.renderScenario(rootStage);
+                        Platform.runLater(() -> loadScenarioChooser(true));
                     });
                 }
                 else {
                     statusFlash.stop();
-                    SettingsManager.setLastSave(null);
+                    SettingsManager.getGlobalSettings().setLastSave(null);
                     loadFile();
                 }
             }).start();
         } else {
             statusLabel.setText("Setting up...");
             new Thread(() -> {
-                if (Objects.equals(SettingsManager.getLastSave(), "firstTime")) {
+                if (Objects.equals(SettingsManager.getGlobalSettings().getLastSave(), "firstTime")) {
                     copyAllDefaults();
                 }
                 ScenarioManager.waitUntilInit();
-                Platform.runLater(this::loadScenarioChooser);
+                Platform.runLater(() -> loadScenarioChooser(false));
             }).start();
         }
     }
 
-    private void loadScenarioChooser() {
+    private void loadScenarioChooser(boolean skip) {
         try {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(Main.class.getResource("/view/fxml/scenarioChooser.fxml")));
             Parent root = loader.load();
-            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.getGlobalSettings().isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
             Scene scene = new Scene(root);
             Stage stage = new Stage();
             loader.<ScenarioChooserController>getController().setStage(stage);
@@ -106,7 +106,9 @@ public class SplashController implements Initializable {
             stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
             statusFlash.stop();
             rootStage.close();
-            stage.showAndWait();
+            stage.show();
+            if (skip) loader.<ScenarioChooserController>getController().renderScenario();
+            else SettingsManager.getGlobalSettings().setLastSave(null);
         } catch (IOException e) {
             e.printStackTrace();
         }

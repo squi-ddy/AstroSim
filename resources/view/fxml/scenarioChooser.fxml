@@ -12,7 +12,7 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" styleClass="root" stylesheets="@../css/common.css" xmlns="http://javafx.com/javafx/16.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.ScenarioChooserController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="540.0" prefWidth="960.0" styleClass="root" stylesheets="@../css/common.css" xmlns="http://javafx.com/javafx/16.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="astrosim.controller.ScenarioChooserController">
    <left>
       <VBox alignment="CENTER" prefWidth="300.0" style="-fx-background-color: -background-color-1; -fx-border-width: 0 1 0 0; -fx-border-color: -theme-color-2;" BorderPane.alignment="CENTER">
          <padding>

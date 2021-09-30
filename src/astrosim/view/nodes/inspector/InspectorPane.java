@@ -32,7 +32,7 @@ public class InspectorPane extends BorderPane {
         gridPane.setHgap(10);
         gridPane.setVgap(5);
         ColumnConstraints column1 = new ColumnConstraints();
-        column1.setPercentWidth(25);
+        column1.setPercentWidth(35);
         column1.setHalignment(HPos.RIGHT);
         ColumnConstraints column2 = new ColumnConstraints();
         column2.setHalignment(HPos.CENTER);
@@ -87,21 +87,33 @@ public class InspectorPane extends BorderPane {
         propertyLabel.getStyleClass().add("inspector-property-label");
         gridPane.add(propertyLabel, 0, row);
         gridPane.add(setting.getToDisplay(), 1, row);
-        setting.addChangeListener(() -> {
+        Runnable update = () -> {
             propertyLabel.getStyleClass().remove("inspector-property-label-invalid");
             propertyLabel.getStyleClass().remove("inspector-property-label-changed");
             if (!setting.isValid()) {
                 propertyLabel.getStyleClass().add("inspector-property-label-invalid");
-            }
-            else if (!setting.isOriginal()) {
+            } else if (!setting.isOriginal()) {
                 propertyLabel.getStyleClass().add("inspector-property-label-changed");
             }
+        };
+        update.run();
+        setting.addChangeListener(update);
+    }
+
+    public void removeSetting(InspectorSetting<?> setting) {
+        int rowNumber = settings.indexOf(setting);
+        gridPane.getChildren().removeIf(node -> GridPane.getRowIndex(node) == rowNumber);
+        gridPane.getChildren().forEach(node -> {
+            if (GridPane.getRowIndex(node) > rowNumber) {
+                GridPane.setRowIndex(node, GridPane.getRowIndex(node) - 1);
+            }
         });
+        settings.remove(setting);
     }
 
     public void loadSettings(Inspectable object) {
-        ScenarioManager.getScenario().stopThread();
-        SettingsManager.setSpeed((short) 0);
+        ScenarioManager.getScenario().stopThreadNow();
+        SettingsManager.getGlobalSettings().setSpeed((short) 0);
         SimulatorGUIManager.getController().syncSpeedButtons();
         this.inspecting = object;
         settings.clear();
@@ -115,6 +127,7 @@ public class InspectorPane extends BorderPane {
     public void showPane() {
         super.setManaged(true);
         super.setVisible(true);
+        SimulatorGUIManager.getController().setSpeed(0);
     }
 
     public void hidePane() {

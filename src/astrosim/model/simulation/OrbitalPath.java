@@ -4,18 +4,21 @@ import astrosim.model.math.Vector2D;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
+import javafx.util.Pair;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class OrbitalPath implements XMLHashable {
     // Stores tracers.
     private final Deque<Vector2D> positionBuffer;
     private final Deque<Vector2D> velocityBuffer;
     private final Deque<Vector2D> positionTrail;
-    private final Deque<Vector2D> velocityTrail;
+    private Pair<Vector2D, Vector2D> lastPosVel;
     private static int maxLength = 0;
     private static int maxBufferLength = 0;
+    private static int positionGap = 0;
+    private int untilNextAdd = 0;
+    private double trailLength = 0;
 
     public static void setMaxLength(int maxLength) {
         OrbitalPath.maxLength = maxLength;
@@ -25,11 +28,13 @@ public class OrbitalPath implements XMLHashable {
         OrbitalPath.maxBufferLength = maxBufferLength;
     }
 
+    public static void setPositionGap(int positionGap) { OrbitalPath.positionGap = positionGap;}
+
     public OrbitalPath(Vector2D position, Vector2D velocity) {
         this.positionTrail = new ArrayDeque<>(List.of(position));
-        this.velocityTrail = new ArrayDeque<>(List.of(velocity));
         this.positionBuffer = new ArrayDeque<>();
         this.velocityBuffer = new ArrayDeque<>();
+        this.lastPosVel = new Pair<>(position, velocity);
     }
 
     public void addPosition(Vector2D pos, Vector2D vel) {
@@ -39,13 +44,10 @@ public class OrbitalPath implements XMLHashable {
         }
     }
 
-    public boolean isBufferFull() {
-        return positionBuffer.size() >= maxBufferLength;
-    }
-
     public void clearBuffer() {
         positionBuffer.clear();
         velocityBuffer.clear();
+        untilNextAdd = 0;
     }
 
     public Vector2D getLatestVelocity() {
@@ -58,51 +60,52 @@ public class OrbitalPath implements XMLHashable {
         return getPosition();
     }
 
-    public List<Double> getTrail() {
-        List<Double> pts = new ArrayList<>();
+    public List<Vector2D> getTrail() {
         List<Vector2D> ptsVector;
-        synchronized (positionTrail) {
-            ptsVector = new ArrayList<>(positionTrail);
-        }
-        for (int i = 0; i < ptsVector.size(); i++) {
-            Vector2D pos = ptsVector.get(i);
-            if (i % 500 == 0) {
-                pts.add(pos.getX());
-                pts.add(pos.getY());
-            }
-        }
-        return pts;
+        ptsVector = new ArrayList<>(positionTrail);
+        ptsVector.add(getPosition());
+        return ptsVector;
     }
 
     public Vector2D getPosition() {
-        return positionTrail.getLast();
+        return lastPosVel.getKey();
     }
 
     public Vector2D getVelocity() {
-        return velocityTrail.getLast();
+        return lastPosVel.getValue();
     }
 
     public void setPosition(Vector2D position, Vector2D velocity) {
         positionTrail.clear();
         positionBuffer.clear();
-        velocityTrail.clear();
         velocityBuffer.clear();
         positionTrail.add(position);
-        velocityTrail.add(velocity);
+        lastPosVel = new Pair<>(position, velocity);
+        untilNextAdd = 0;
+        trailLength = 0;
     }
 
     public void addToTrail(int steps) {
         if (steps > positionBuffer.size()) throw new IllegalArgumentException();
         for (int i = 0; i < steps; i++) {
-            positionTrail.add(positionBuffer.getFirst());
-            velocityTrail.add(velocityBuffer.getFirst());
+            if (untilNextAdd == 0) {
+                trailLength += positionBuffer.getFirst().sub(positionTrail.getLast()).magnitude();
+                positionTrail.add(positionBuffer.getFirst());
+                untilNextAdd = positionGap + 1;
+            }
+            lastPosVel = new Pair<>(positionBuffer.getFirst(), velocityBuffer.getFirst());
             positionBuffer.removeFirst();
             velocityBuffer.removeFirst();
+            untilNextAdd--;
         }
         while (positionTrail.size() > maxLength) {
-            positionTrail.removeFirst();
-            velocityTrail.removeFirst();
+            Vector2D last = positionTrail.removeFirst();
+            trailLength -= last.sub(positionTrail.getFirst()).magnitude();
         }
+    }
+
+    public double getTrailLength() {
+        return trailLength + getPosition().sub(positionTrail.getLast()).magnitude();
     }
 
     @Override

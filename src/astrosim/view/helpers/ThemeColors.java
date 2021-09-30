@@ -18,7 +18,7 @@ public class ThemeColors {
     public static Color getThemeColor(String name) {
         try {
             CssParser parser = new CssParser();
-            Stylesheet css = parser.parse(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.isDarkMode() ? "dark.css" : "light.css"))));
+            Stylesheet css = parser.parse(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.getGlobalSettings().isDarkMode() ? "dark.css" : "light.css"))));
             Rule rootRule = css.getRules().get(0);
             Optional<Declaration> declaration = rootRule.getDeclarations().stream().filter(d -> d.getProperty().equals(name)).findFirst();
             if (declaration.isPresent()) {

@@ -2,6 +2,8 @@
 <astrosim>
     <saveNames>
         <elem0>onePlanet.xml</elem0>
-        <size>1</size>
+        <elem1>dualOrbit.xml</elem1>
+        <elem2>bisection.xml</elem2>
+        <size>3</size>
     </saveNames>
 </astrosim>

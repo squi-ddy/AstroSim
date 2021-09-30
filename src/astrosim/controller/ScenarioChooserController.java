@@ -1,5 +1,6 @@
 package astrosim.controller;
 
+import astrosim.Main;
 import astrosim.model.managers.ResourceManager;
 import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.SettingsManager;
@@ -15,6 +16,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.SVGPath;
@@ -27,6 +29,8 @@ import java.util.ResourceBundle;
 
 public class ScenarioChooserController implements Initializable {
     @FXML
+    private BorderPane root;
+    @FXML
     private VBox scenarioLister;
     @FXML
     private ImageView logoImage;
@@ -38,9 +42,9 @@ public class ScenarioChooserController implements Initializable {
     }
 
     private Parent createScenarioTile(String fileName, String scenarioName) {
-        VBox root = new VBox();
-        root.setAlignment(Pos.TOP_CENTER);
-        root.getStyleClass().add("save-chooser-elem");
+        VBox tileRoot = new VBox();
+        tileRoot.setAlignment(Pos.TOP_CENTER);
+        tileRoot.getStyleClass().add("save-chooser-elem");
         Label topLabel = new Label(scenarioName);
         topLabel.setFont(new Font(18));
         topLabel.setStyle("-fx-text-fill: -theme-text-color-2;");
@@ -49,8 +53,8 @@ public class ScenarioChooserController implements Initializable {
         bottomLabel.setStyle("-fx-text-fill: -theme-text-color-2;");
         HBox bottomHBox = new HBox(bottomLabel);
         bottomHBox.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(topLabel, bottomLabel);
-        root.setOnMouseEntered(e -> {
+        tileRoot.getChildren().addAll(topLabel, bottomLabel);
+        tileRoot.setOnMouseEntered(e -> {
             topLabel.setStyle("-fx-text-fill: -theme-text-color-1;");
             bottomLabel.setStyle("-fx-text-fill: -theme-text-color-1;");
             SVGPath xSymbolShape = new SVGPath();
@@ -62,34 +66,47 @@ public class ScenarioChooserController implements Initializable {
             xButtonGroup.setManaged(false);
             xButtonGroup.getChildren().add(xButton);
             xButton.getStyleClass().add("themed-button");
-            root.getChildren().add(xButtonGroup);
-            xButtonGroup.layoutXProperty().bind(root.widthProperty().subtract(20).subtract(15));
-            xButtonGroup.layoutYProperty().bind(root.heightProperty().divide(2).subtract(15));
+            tileRoot.getChildren().add(xButtonGroup);
+            xButtonGroup.layoutXProperty().bind(tileRoot.widthProperty().subtract(20).subtract(15));
+            xButtonGroup.layoutYProperty().bind(tileRoot.heightProperty().divide(2).subtract(15));
             xButton.setOnAction(action -> {
                 new Thread(() -> ScenarioManager.deleteScenario(fileName)).start(); // this is a time-consuming action, do in a thread.
-                scenarioLister.getChildren().removeIf(node -> node == root);
+                scenarioLister.getChildren().removeIf(node -> node == tileRoot);
                 doIfEmpty();
             });
         });
-        root.setOnMouseExited(e -> {
+        tileRoot.setOnMouseExited(e -> {
             topLabel.setStyle("-fx-text-fill: -theme-text-color-2;");
             bottomLabel.setStyle("-fx-text-fill: -theme-text-color-2;");
-            root.getChildren().removeIf(Group.class::isInstance);
+            tileRoot.getChildren().removeIf(Group.class::isInstance);
         });
-        root.setOnMouseClicked(e -> {
+        tileRoot.setOnMouseClicked(e -> {
             if (e.getClickCount() >= 2 && e.getButton() == MouseButton.PRIMARY) {
                 ScenarioManager.loadScenario(fileName);
-                ScenarioManager.renderScenario(stage);
-                stage.showAndWait();
+                renderScenario();
             }
         });
-        return root;
+        return tileRoot;
     }
 
     @FXML
     private void createScenario() {
         ScenarioManager.makeScenario();
+        renderScenario();
+    }
+
+    public void renderScenario() {
         ScenarioManager.renderScenario(stage);
+        loadFiles();
+        root.getStylesheets().removeIf(s -> s.contains("dark") || s.contains("light"));
+        root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.getGlobalSettings().isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+        new Thread(() -> {
+            try {
+                SettingsManager.save();
+            } catch (XMLParseException e) {
+                e.printStackTrace();
+            }
+        }).start();
         stage.showAndWait();
     }
 
@@ -102,10 +119,8 @@ public class ScenarioChooserController implements Initializable {
         }
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
-        logoImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/logo.png"))));
-        SettingsManager.setLastSave(null);
+    private void loadFiles() {
+        scenarioLister.getChildren().clear();
         ResourceManager.getFilesInDirectory("saves/").forEach(p -> {
             try {
                 XMLParser parser = new XMLParser(p);
@@ -115,5 +130,11 @@ public class ScenarioChooserController implements Initializable {
             }
         });
         doIfEmpty();
+    }
+
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        logoImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/logo.png"))));
+        loadFiles();
     }
  }

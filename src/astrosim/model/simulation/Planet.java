@@ -17,6 +17,7 @@ public class Planet implements XMLHashable {
     private double radius;
     private final OrbitalPath path;
     private String color;
+    private String trailColor;
     private Runnable updateListener;
 
     private static final char[] converter = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
@@ -31,17 +32,18 @@ public class Planet implements XMLHashable {
         return "#" + result;
     }
 
-    public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic, String name, String color) {
+    public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic, String name, String color, String trailColor) {
         this.mass = mass;
         this.radius = radius;
         this.isStatic = isStatic;
         this.name = name;
         this.path = new OrbitalPath(position, velocity);
         this.color = color;
+        this.trailColor = trailColor;
     }
 
     public Planet() {
-        this(new Vector2D(), new Vector2D(), 1e18, 20, false, "Planet", getRandomColor());
+        this(new Vector2D(), new Vector2D(), 1e18, 20, false, "Planet", getRandomColor(), getRandomColor());
     }
 
     public double getMass() {
@@ -68,6 +70,15 @@ public class Planet implements XMLHashable {
 
     public boolean isStatic() {
         return isStatic;
+    }
+
+    public String getTrailColor() {
+        return trailColor;
+    }
+
+    public void setTrailColor(String trailColor) {
+        this.trailColor = trailColor;
+        updateListener.run();
     }
 
     public void setColor(String color) {
@@ -117,6 +128,7 @@ public class Planet implements XMLHashable {
         hashed.put("name", new XMLNodeInfo(String.valueOf(name)));
         hashed.put("path", path.hashed());
         hashed.put("color", new XMLNodeInfo(color));
+        hashed.put("trailColor", new XMLNodeInfo(trailColor));
         return new XMLNodeInfo(hashed);
     }
 
@@ -129,7 +141,8 @@ public class Planet implements XMLHashable {
             String name = data.get("name").getValue();
             OrbitalPath path = OrbitalPath.fromXML(data.get("path"));
             String color = data.get("color").getValue();
-            return new Planet(path.getPosition(), path.getVelocity(), mass, radius, isStatic, name, color);
+            String trailColor = data.get("trailColor").getValue();
+            return new Planet(path.getPosition(), path.getVelocity(), mass, radius, isStatic, name, color, trailColor);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }

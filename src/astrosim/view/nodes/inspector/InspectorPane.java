@@ -1,7 +1,7 @@
 package astrosim.view.nodes.inspector;
 
 import astrosim.model.managers.ScenarioManager;
-import astrosim.model.managers.Settings;
+import astrosim.model.managers.SettingsManager;
 import astrosim.model.managers.SimulatorGUIManager;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
@@ -101,7 +101,7 @@ public class InspectorPane extends BorderPane {
 
     public void loadSettings(Inspectable object) {
         ScenarioManager.getScenario().stopThread();
-        Settings.setSpeed((short) 0);
+        SettingsManager.setSpeed((short) 0);
         SimulatorGUIManager.getController().syncSpeedButtons();
         this.inspecting = object;
         settings.clear();

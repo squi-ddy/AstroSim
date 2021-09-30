@@ -33,8 +33,7 @@ public class PlanetNode extends Group implements Inspectable {
         trail = new Polyline();
         Color themeColor = ThemeColors.getThemeColor("-theme-contrast-color-1");
         if (themeColor == null) throw new IllegalStateException();
-        trail.setStroke(themeColor);
-        trail.strokeWidthProperty().bind(new SimpleDoubleProperty(5).divide(SimulatorGUIManager.scaleProperty()));
+        trail.strokeWidthProperty().bind(new SimpleDoubleProperty(2.5).divide(SimulatorGUIManager.scaleProperty()));
         planetBody = new Circle();
         planetBody.setStroke(Color.TRANSPARENT);
         planetBody.strokeWidthProperty().bind(new SimpleDoubleProperty(2.5).divide(SimulatorGUIManager.scaleProperty()));
@@ -68,14 +67,17 @@ public class PlanetNode extends Group implements Inspectable {
         return planet;
     }
 
+    public void updatePlanet(List<Double> newTrail) {
+        planetBody.setCenterX(planet.getPosition().getX());
+        planetBody.setCenterY(planet.getPosition().getY());
+        planetBody.setRadius(planet.getRadius());
+        planetBody.setFill(Color.web(planet.getColor()));
+        trail.setStroke(Color.web(planet.getTrailColor()));
+        trail.getPoints().setAll(newTrail);
+    }
+
     public void updatePlanet() {
-        synchronized (this) {
-            planetBody.setCenterX(planet.getPosition().getX());
-            planetBody.setCenterY(planet.getPosition().getY());
-            planetBody.setRadius(planet.getRadius());
-            planetBody.setFill(Color.web(planet.getColor()));
-            trail.getPoints().setAll(planet.getPath().getTrail());
-        }
+        updatePlanet(planet.getPath().getTrail());
     }
 
     private void doOnSelect() {
@@ -93,8 +95,9 @@ public class PlanetNode extends Group implements Inspectable {
     public List<InspectorSetting<?>> getSettings() {
         List<InspectorSetting<?>> settings = new ArrayList<>();
         settings.add(new StringInspectorSetting("Name", planet.getName(), planet::setName, s -> true));
-        settings.add(new StringInspectorSetting("Color", planet.getColor(), planet::setColor, s -> s.matches("#[0-9a-fA-F]{6}")));
-        settings.add(new DoubleInspectorSetting("Mass", planet.getMass(), planet::setMass, s -> s != null && s > 0));
+        settings.add(new StringInspectorSetting("Fill", planet.getColor(), planet::setColor, s -> s.matches("#[0-9a-fA-F]{6}")));
+        settings.add(new StringInspectorSetting("Trail", planet.getTrailColor(), planet::setTrailColor, s -> s.matches("#[0-9a-fA-F]{6}")));
+        settings.add(new DoubleInspectorSetting("Mass", planet.getMass(), planet::setMass, s -> s != null && s >= 0));
         settings.add(new DoubleInspectorSetting("Radius", planet.getRadius(), planet::setRadius, s -> s != null && s > 0));
         settings.add(new Vector2DInspectorSetting("Position", planet.getPosition(), v -> planet.setPosition(v, planet.getVelocity()), Objects::nonNull));
         settings.add(new Vector2DInspectorSetting("Velocity", planet.getVelocity(), v -> planet.setPosition(planet.getPosition(), v), Objects::nonNull));

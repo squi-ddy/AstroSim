@@ -1,6 +1,6 @@
 package astrosim.model.simulation;
 
-import astrosim.model.managers.Settings;
+import astrosim.model.managers.SettingsManager;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLList;
 import astrosim.model.xml.XMLNodeInfo;
@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Scenario implements XMLHashable {
     private double valG;
@@ -36,19 +37,32 @@ public class Scenario implements XMLHashable {
     }
 
     public void stopThread() {
-        runner.shutdownNow();
+        if (runner != null) {
+            runner.shutdownNow();
+            waitForThreadEnd();
+        }
     }
 
     public void startThread() {
+        stopThread();
         planets.forEach(p -> p.getPath().clearBuffer());
         runner = Executors.newSingleThreadExecutor();
-        Simulator simulator = new Simulator(Settings.getMaxBufferInTrail());
+        Simulator simulator = new Simulator(SettingsManager.getMaxBufferInTrail());
         runner.submit(simulator);
     }
 
     public void simulateSteps(int steps) {
         Simulator simulator = new Simulator(steps);
         runner.submit(simulator);
+    }
+
+    public void waitForThreadEnd() {
+        try {
+            boolean result = runner.awaitTermination(1000, TimeUnit.SECONDS);
+            if (!result) throw new IllegalStateException();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     public void setValG(double valG) {

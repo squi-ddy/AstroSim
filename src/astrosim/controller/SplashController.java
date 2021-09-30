@@ -2,7 +2,7 @@ package astrosim.controller;
 
 import astrosim.Main;
 import astrosim.model.managers.ScenarioManager;
-import astrosim.model.managers.Settings;
+import astrosim.model.managers.SettingsManager;
 import astrosim.model.xml.XMLList;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
@@ -58,14 +58,14 @@ public class SplashController implements Initializable {
     private void loadSettings() {
         statusFlash.play();
         new Thread(() -> {
-            Settings.waitUntilInit();
+            SettingsManager.waitUntilInit();
             Platform.runLater(this::loadFile);
         }).start();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     private void loadFile() {
-        if (Settings.getLastSave() != null && !Settings.getLastSave().equals("firstTime")) {
+        if (SettingsManager.getLastSave() != null && !SettingsManager.getLastSave().equals("firstTime")) {
             statusLabel.setText("Loading save...");
             new Thread(() -> {
                 if (ScenarioManager.waitUntilInit()) {
@@ -76,14 +76,14 @@ public class SplashController implements Initializable {
                 }
                 else {
                     statusFlash.stop();
-                    Settings.setLastSave(null);
+                    SettingsManager.setLastSave(null);
                     loadFile();
                 }
             }).start();
         } else {
             statusLabel.setText("Setting up...");
             new Thread(() -> {
-                if (Objects.equals(Settings.getLastSave(), "firstTime")) {
+                if (Objects.equals(SettingsManager.getLastSave(), "firstTime")) {
                     copyAllDefaults();
                 }
                 ScenarioManager.waitUntilInit();
@@ -96,7 +96,7 @@ public class SplashController implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(Main.class.getResource("/view/fxml/scenarioChooser.fxml")));
             Parent root = loader.load();
-            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
             Scene scene = new Scene(root);
             Stage stage = new Stage();
             loader.<ScenarioChooserController>getController().setStage(stage);

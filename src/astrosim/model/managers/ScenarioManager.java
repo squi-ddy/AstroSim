@@ -25,7 +25,7 @@ public class ScenarioManager {
     private ScenarioManager() {}
 
     static {
-        String lastSave = Settings.getLastSave();
+        String lastSave = SettingsManager.getLastSave();
         if (lastSave != null && lastSave.matches(".+\\.xml")) {
             try {
                 parser = new XMLParser(ResourceManager.getPath("saves/" + lastSave));
@@ -48,7 +48,7 @@ public class ScenarioManager {
     public static void deleteScenario(String name) {
         try {
             Files.delete(ResourceManager.getPath("saves/" + name));
-            Settings.setLastSave(null);
+            SettingsManager.setLastSave(null);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -60,7 +60,7 @@ public class ScenarioManager {
 
     public static void loadScenario(String name) {
         try {
-            Settings.setLastSave(name);
+            SettingsManager.setLastSave(name);
             parser = new XMLParser(ResourceManager.getPath("saves/" + name));
             scenario = Scenario.fromXML(parser.getContent().get("scenario"));
         } catch (XMLParseException e) {
@@ -72,21 +72,23 @@ public class ScenarioManager {
         Path result = ResourceManager.guaranteeExists("saves/" + fileName, "/defaultSave.xml");
         parser = new XMLParser(result);
         parser.writeContent(new String[]{"scenario"}, scenario.hashed());
-        Settings.setLastSave(fileName);
+        SettingsManager.setLastSave(fileName);
     }
 
     public static void renderScenario(Stage toHide) {
         try {
             Stage stage = new Stage();
             Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/view/fxml/simulator.fxml")));
-            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (Settings.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
             Scene scene = new Scene(root);
             stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
             stage.setScene(scene);
             stage.setTitle("AstroSim");
             Platform.runLater(toHide::hide);
             SimulatorGUIManager.getInspector().hidePane();
+            SimulatorGUIManager.getController().setStage(stage);
             stage.showAndWait();
+            SimulatorGUIManager.getController().setSpeed(0);
         } catch (IOException e) {
             e.printStackTrace();
         }

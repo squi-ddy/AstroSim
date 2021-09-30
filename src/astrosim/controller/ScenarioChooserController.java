@@ -2,7 +2,7 @@ package astrosim.controller;
 
 import astrosim.model.managers.ResourceManager;
 import astrosim.model.managers.ScenarioManager;
-import astrosim.model.managers.Settings;
+import astrosim.model.managers.SettingsManager;
 import astrosim.model.xml.XMLParseException;
 import astrosim.model.xml.XMLParser;
 import javafx.fxml.FXML;
@@ -105,7 +105,7 @@ public class ScenarioChooserController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         logoImage.setImage(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/logo.png"))));
-        Settings.setLastSave(null);
+        SettingsManager.setLastSave(null);
         ResourceManager.getFilesInDirectory("saves/").forEach(p -> {
             try {
                 XMLParser parser = new XMLParser(p);

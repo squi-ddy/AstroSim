@@ -11,8 +11,7 @@ import java.util.Map;
 public class Vector2D implements XMLHashable {
     private final double x;
     private final double y;
-
-    public static final Vector2D EMPTY = new Vector2D();
+    private Double magnitude = null;
 
     public Vector2D() {
         this(0, 0);
@@ -40,7 +39,10 @@ public class Vector2D implements XMLHashable {
     }
 
     public double magnitude() {
-        return Math.sqrt(x * x + y * y);
+        if (magnitude == null) {
+            magnitude = Math.sqrt(x * x + y * y);
+        }
+        return magnitude;
     }
 
     public Vector2D normalise() {

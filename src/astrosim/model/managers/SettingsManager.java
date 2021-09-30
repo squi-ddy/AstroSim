@@ -9,14 +9,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 
-public class Settings {
-    private Settings() {}
+public class SettingsManager {
+    private SettingsManager() {}
 
     private static final Path filepath = Paths.get(System.getProperty("user.dir"), "settings.xml");
     private static XMLParser settingsXML;
     private static short accuracy = 5; // global simulation accuracy (a number between 1 - 10) -> determines time step
     private static String lastSave = null; // file path to last save; provides smoothness
-    private static short speed = 1; // The speed of the simulation
+    private static short speed = 0; // The speed of the simulation
     private static int maxPointsInTrail = 10000;
     private static int maxBufferInTrail = 3000;
     private static boolean darkMode = true;
@@ -27,8 +27,8 @@ public class Settings {
     static {
         try {
             ResourceManager.guaranteeExists(filepath, "/settings.xml");
-            Settings.settingsXML = new XMLParser(filepath);
-            fromXML(Settings.settingsXML.getContent(new String[]{"settings"}).get("settings"));
+            SettingsManager.settingsXML = new XMLParser(filepath);
+            fromXML(SettingsManager.settingsXML.getContent(new String[]{"settings"}).get("settings"));
             // A sleep for the splash screen
             Thread.sleep(2000);
         } catch (@SuppressWarnings("java:S2142") XMLParseException | InterruptedException e) {
@@ -39,7 +39,7 @@ public class Settings {
     public static void waitUntilInit() { /* Empty method to wait for construct */ }
 
     public static void setDarkMode(boolean darkMode) {
-        Settings.darkMode = darkMode;
+        SettingsManager.darkMode = darkMode;
         try {
             settingsXML.writeContent(new String[]{"settings", "dark"}, new XMLNodeInfo(String.valueOf(darkMode)));
         } catch (XMLParseException e) {
@@ -52,7 +52,7 @@ public class Settings {
     }
 
     public static void setMaxBufferInTrail(int maxBufferInTrail) {
-        Settings.maxBufferInTrail = maxBufferInTrail;
+        SettingsManager.maxBufferInTrail = maxBufferInTrail;
         try {
             settingsXML.writeContent(new String[]{"settings", "bufferLen"}, new XMLNodeInfo(String.valueOf(maxBufferInTrail)));
         } catch (XMLParseException e) {
@@ -61,7 +61,7 @@ public class Settings {
     }
 
     public static void setMaxPointsInTrail(int maxPointsInTrail) {
-        Settings.maxPointsInTrail = maxPointsInTrail;
+        SettingsManager.maxPointsInTrail = maxPointsInTrail;
         try {
             settingsXML.writeContent(new String[]{"settings", "trailLen"}, new XMLNodeInfo(String.valueOf(maxPointsInTrail)));
         } catch (XMLParseException e) {
@@ -78,7 +78,7 @@ public class Settings {
     }
 
     public static void setAccuracy(short accuracy) {
-        Settings.accuracy = accuracy;
+        SettingsManager.accuracy = accuracy;
         try {
             settingsXML.writeContent(new String[]{"settings", "accuracy"}, new XMLNodeInfo(String.valueOf(accuracy)));
         } catch (XMLParseException e) {
@@ -87,7 +87,7 @@ public class Settings {
     }
 
     public static void setSpeed(short speed) {
-        Settings.speed = speed;
+        SettingsManager.speed = speed;
         try {
             settingsXML.writeContent(new String[]{"settings", "speed"}, new XMLNodeInfo(String.valueOf(speed)));
         } catch (XMLParseException e) {
@@ -96,7 +96,7 @@ public class Settings {
     }
 
     public static void setSensitivity(int sensitivity) {
-        Settings.sensitivity = sensitivity;
+        SettingsManager.sensitivity = sensitivity;
         try {
             settingsXML.writeContent(new String[]{"settings", "sensitivity"}, new XMLNodeInfo(String.valueOf(sensitivity)));
         } catch (XMLParseException e) {
@@ -121,7 +121,7 @@ public class Settings {
     }
 
     public static void setLastSave(String lastSave) {
-        Settings.lastSave = lastSave;
+        SettingsManager.lastSave = lastSave;
         try {
             settingsXML.writeContent(new String[]{"settings", "lastSave"}, new XMLNodeInfo((lastSave != null) ? lastSave : "null"));
         } catch (XMLParseException e) {
@@ -138,7 +138,6 @@ public class Settings {
             Map<String, XMLNodeInfo> settings = info.getDataTable();
             accuracy = Short.parseShort(settings.get("accuracy").getValue());
             lastSave = (settings.get("lastSave").getValue().equals("null") ? null : settings.get("lastSave").getValue());
-            speed = Short.parseShort(settings.get("speed").getValue());
             maxBufferInTrail = Integer.parseInt(settings.get("bufferLen").getValue());
             OrbitalPath.setMaxBufferLength(maxBufferInTrail);
             maxPointsInTrail = Integer.parseInt(settings.get("trailLen").getValue());

@@ -10,10 +10,10 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 
 public class OrbitalPath implements XMLHashable {
     // Stores tracers.
-    private final ConcurrentLinkedDeque<Vector2D> positionBuffer;
-    private final ConcurrentLinkedDeque<Vector2D> velocityBuffer;
-    private final ConcurrentLinkedDeque<Vector2D> positionTrail;
-    private final ConcurrentLinkedDeque<Vector2D> velocityTrail;
+    private final Deque<Vector2D> positionBuffer;
+    private final Deque<Vector2D> velocityBuffer;
+    private final Deque<Vector2D> positionTrail;
+    private final Deque<Vector2D> velocityTrail;
     private static int maxLength = 0;
     private static int maxBufferLength = 0;
 
@@ -26,10 +26,10 @@ public class OrbitalPath implements XMLHashable {
     }
 
     public OrbitalPath(Vector2D position, Vector2D velocity) {
-        this.positionTrail = new ConcurrentLinkedDeque<>(List.of(position));
-        this.velocityTrail = new ConcurrentLinkedDeque<>(List.of(velocity));
-        this.positionBuffer = new ConcurrentLinkedDeque<>();
-        this.velocityBuffer = new ConcurrentLinkedDeque<>();
+        this.positionTrail = new ArrayDeque<>(List.of(position));
+        this.velocityTrail = new ArrayDeque<>(List.of(velocity));
+        this.positionBuffer = new ArrayDeque<>();
+        this.velocityBuffer = new ArrayDeque<>();
     }
 
     public void addPosition(Vector2D pos, Vector2D vel) {
@@ -60,15 +60,16 @@ public class OrbitalPath implements XMLHashable {
 
     public List<Double> getTrail() {
         List<Double> pts = new ArrayList<>();
-        Iterator<Vector2D> it = positionTrail.iterator();
-        int index = 0;
-        while (it.hasNext()) {
-            Vector2D pos = it.next();
-            if (index % 500 == 0) {
+        List<Vector2D> ptsVector;
+        synchronized (positionTrail) {
+            ptsVector = new ArrayList<>(positionTrail);
+        }
+        for (int i = 0; i < ptsVector.size(); i++) {
+            Vector2D pos = ptsVector.get(i);
+            if (i % 500 == 0) {
                 pts.add(pos.getX());
                 pts.add(pos.getY());
             }
-            index++;
         }
         return pts;
     }
@@ -79,11 +80,6 @@ public class OrbitalPath implements XMLHashable {
 
     public Vector2D getVelocity() {
         return velocityTrail.getLast();
-    }
-
-    public void clearTrail() {
-        velocityTrail.clear();
-        positionTrail.clear();
     }
 
     public void setPosition(Vector2D position, Vector2D velocity) {
@@ -107,10 +103,6 @@ public class OrbitalPath implements XMLHashable {
             positionTrail.removeFirst();
             velocityTrail.removeFirst();
         }
-    }
-
-    public Deque<Vector2D> getPositionBuffer() {
-        return positionBuffer;
     }
 
     @Override

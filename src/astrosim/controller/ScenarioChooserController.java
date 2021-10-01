@@ -107,6 +107,7 @@ public class ScenarioChooserController implements Initializable {
                 e.printStackTrace();
             }
         }).start();
+        ScenarioManager.getScenario().stopThreadNow();
         stage.showAndWait();
     }
 

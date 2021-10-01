@@ -1,10 +1,11 @@
 .root {
-    -theme-color-1: #d7eef4;
+    -theme-color-1: #aaccff;
     -theme-color-2: #000000;
-    -theme-color-3: #d8e2e3;
+    -theme-color-3: #87cdde;
     -theme-text-color-1: #000000;
-    -theme-text-color-2: #888888;
+    -theme-text-color-2: #939dac;
     -theme-error-color: #aa0000;
     -theme-change-color: #00aa00;
+    -theme-sky-color: #214478;
     -theme-contrast-color-1: #d7eef4;
 }

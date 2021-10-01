@@ -1,9 +1,11 @@
 package astrosim.model.simulation;
 
+import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.SimulatorGUIManager;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
+import astrosim.view.nodes.Trail;
 import astrosim.view.nodes.inspector.*;
 
 import java.util.ArrayList;
@@ -121,6 +123,8 @@ public class Settings implements XMLHashable, Inspectable {
             int sensitivity = Integer.parseInt(settings.get("sensitivity").getValue());
             int positionGapInTrail = Integer.parseInt(settings.get("positionGap").getValue());
             double burstFactor = Double.parseDouble(settings.get("burstFactor").getValue());
+            Trail.setGraphicMode(Integer.parseInt(settings.get("renderQuality").getValue()));
+            Trail.setShowingPermanent(Boolean.parseBoolean(settings.get("permanentTrail").getValue()));
             return new Settings(accuracy, lastSave, maxPointsInTrail, maxBufferInTrail, positionGapInTrail, darkMode, burstFactor, sensitivity);
         } catch (XMLParseException | NumberFormatException | NullPointerException e) {
             throw new XMLParseException(XMLParseException.Type.XML_ERROR);
@@ -138,6 +142,8 @@ public class Settings implements XMLHashable, Inspectable {
         hashed.put("sensitivity", new XMLNodeInfo(String.valueOf(sensitivity)));
         hashed.put("positionGap", new XMLNodeInfo(String.valueOf(positionGapInTrail)));
         hashed.put("burstFactor", new XMLNodeInfo(String.valueOf(burstFactor)));
+        hashed.put("renderQuality", new XMLNodeInfo(String.valueOf(Trail.getGraphicMode())));
+        hashed.put("permanentTrail", new XMLNodeInfo(String.valueOf(Trail.isShowingPermanent())));
         return new XMLNodeInfo(hashed);
     }
 
@@ -149,13 +155,15 @@ public class Settings implements XMLHashable, Inspectable {
         settings.add(new IntegerInspectorSetting("Buffer Length", maxBufferInTrail, this::setMaxBufferInTrail, a -> a != null && a >= 50));
         settings.add(new IntegerInspectorSetting("Trail Gap", positionGapInTrail, this::setPositionGapInTrail, a -> a != null && a >= 0));
         settings.add(new DoubleInspectorSetting("Burst Factor", burstFactor, this::setBurstFactor, f -> f != null && f > 0));
-        settings.add(new BooleanInspectorSetting("Dark Mode", darkMode, this::setDarkMode));
         settings.add(new IntegerInspectorSetting("Sensitivity", sensitivity, this::setSensitivity, s -> s != null && s > 0));
+        settings.add(new ListInspectorSetting("Graphics", Trail.getGraphicMode(), Trail::setGraphicMode, List.of("Low", "Medium", "High")));
+        settings.add(new BooleanInspectorSetting("Draw Trails", Trail.isShowingPermanent(), Trail::setShowingPermanent));
+        settings.add(new BooleanInspectorSetting("Dark Mode", darkMode, this::setDarkMode));
         return settings;
     }
 
     @Override
     public void onClose() {
-        // do nothing
+        ScenarioManager.getScenario().getPlanets().forEach(p -> p.getPath().getLine().updateGlobalSettings());
     }
 }

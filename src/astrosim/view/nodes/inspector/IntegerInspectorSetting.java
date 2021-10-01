@@ -7,7 +7,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class IntegerInspectorSetting extends InspectorSetting<Integer> {
-    // Implements InspectorSetting for Integers..
+    // Implements InspectorSetting for Integers.
     private final Group toDisplay;
     private final TextField entryField;
 

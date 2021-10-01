@@ -4,14 +4,8 @@ import astrosim.model.math.Vector2D;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
-import javafx.scene.Group;
-import javafx.scene.Node;
+import astrosim.view.nodes.Trail;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.StrokeLineCap;
 import javafx.util.Pair;
 
 import java.util.ArrayDeque;
@@ -27,10 +21,9 @@ public class OrbitalPath implements XMLHashable {
     private static int maxLength = 0;
     private static int maxBufferLength = 0;
     private static int positionGap = 0;
+    private static int pending = 0;
     private int untilNextAdd = positionGap;
-    private double trailLength = 0;
-    private final Group trail;
-    private Planet planet;
+    private final Trail trail;
 
     public static void setMaxLength(int maxLength) {
         OrbitalPath.maxLength = maxLength;
@@ -44,26 +37,34 @@ public class OrbitalPath implements XMLHashable {
         OrbitalPath.positionGap = positionGap;
     }
 
+    public static void addPending(int steps) {pending += steps;}
+
+    public static void removePending(int steps) {pending -= steps;}
+
     public static int getMaxBufferLength() {
         return maxBufferLength;
     }
 
     public void setPlanet(Planet planet) {
-        this.planet = planet;
+        trail.setColor(Color.web(planet.getTrailColor()));
     }
 
     public OrbitalPath(Vector2D position, Vector2D velocity) {
-        this.trail = new Group(new Line(position.getX(), position.getY(), position.getX(), position.getY()));
+        this.trail = new Trail(position, this);
         this.positionBuffer = new ArrayDeque<>();
         this.velocityBuffer = new ArrayDeque<>();
         this.lastPosVel = new Pair<>(position, velocity);
     }
 
     public void addPosition(Vector2D pos, Vector2D vel) {
-        if (positionBuffer.size() < maxBufferLength) {
+        if (positionBuffer.size() < maxBufferLength + pending) {
             positionBuffer.add(pos);
             velocityBuffer.add(vel);
         }
+    }
+
+    public boolean isBufferFull() {
+        return positionBuffer.size() >= maxBufferLength + pending;
     }
 
     public void clearBuffer() {
@@ -72,47 +73,8 @@ public class OrbitalPath implements XMLHashable {
         untilNextAdd = 0;
     }
 
-    public Group getLine() {
+    public Trail getLine() {
         return trail;
-    }
-
-    private void changePoint(Vector2D end) {
-        Line lastLine = (Line) trail.getChildren().get(trail.getChildren().size() - 1);
-        lastLine.setEndX(end.getX());
-        lastLine.setEndY(end.getY());
-    }
-
-    private void addPointToTrail(Vector2D end) {
-        Line lastLine = (Line) trail.getChildren().get(trail.getChildren().size() - 1);
-        lastLine.setEndX(end.getX());
-        lastLine.setEndY(end.getY());
-        trailLength += new Vector2D(lastLine.getStartX(), lastLine.getStartY()).sub(new Vector2D(lastLine.getEndX(), lastLine.getEndY())).magnitude();
-        Line line = new Line(end.getX(), end.getY(), end.getX(), end.getY());
-        line.setStrokeLineCap(StrokeLineCap.BUTT);
-        line.setStrokeWidth(planet.getRadius() * 0.5);
-        line.setStroke(Color.web(planet.getTrailColor()));
-        trail.getChildren().add(line);
-        double currTrailLength = 0;
-        for (Node node : trail.getChildren()) {
-            Line currLine = (Line) node;
-            double extraLength = new Vector2D(currLine.getStartX(), currLine.getStartY()).sub(new Vector2D(currLine.getEndX(), currLine.getEndY())).magnitude();
-            /*currLine.setStroke(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, Color.web(planet.getTrailColor()).deriveColor(1, 1, 1, getTransparency(currTrailLength / trailLength))),
-                    new Stop(1, Color.web(planet.getTrailColor()).deriveColor(1, 1, 1, getTransparency((currTrailLength + extraLength) / trailLength)))
-            ));*/
-            currLine.setStroke(Color.web(planet.getTrailColor()).deriveColor(1, 1, 1, getTransparency(currTrailLength / trailLength)));
-            currTrailLength += extraLength;
-        }
-    }
-
-    private void deletePointFromTrail() {
-        Line line = (Line) trail.getChildren().get(0);
-        trailLength -= new Vector2D(line.getStartX(), line.getStartY()).sub(new Vector2D(line.getEndX(), line.getEndY())).magnitude();
-        trail.getChildren().remove(0);
-    }
-
-    private double getTransparency(double interpolate) {
-        return interpolate * interpolate;
     }
 
     public Vector2D getLatestVelocity() {
@@ -134,29 +96,27 @@ public class OrbitalPath implements XMLHashable {
     }
 
     public void setPosition(Vector2D position, Vector2D velocity) {
-        trail.getChildren().clear();
-        trail.getChildren().add(new Line(position.getX(), position.getY(), position.getX(), position.getY()));
         positionBuffer.clear();
         velocityBuffer.clear();
         lastPosVel = new Pair<>(position, velocity);
         untilNextAdd = 0;
-        trailLength = 0;
+        trail.clearTrail();
+        trail.resetPermanentTrail();
     }
 
     public void addToTrail(int steps) {
         if (steps > positionBuffer.size()) throw new IllegalArgumentException();
         for (int i = 0; i < steps; i++) {
             if (untilNextAdd == 0) {
-                addPointToTrail(positionBuffer.getFirst());
+                trail.addPointToTrail(positionBuffer.getFirst());
                 untilNextAdd = positionGap + 1;
             }
-            lastPosVel = new Pair<>(positionBuffer.getFirst(), velocityBuffer.getFirst());
-            changePoint(positionBuffer.removeFirst());
-            velocityBuffer.removeFirst();
+            lastPosVel = new Pair<>(positionBuffer.removeFirst(), velocityBuffer.removeFirst());
             untilNextAdd--;
         }
-        while (trail.getChildren().size() > maxLength + 1) {
-            deletePointFromTrail();
+        trail.changePoint(lastPosVel.getKey());
+        while (trail.getNumPoints() > maxLength + 1) {
+            trail.deletePointFromTrail();
         }
     }
 

@@ -7,10 +7,9 @@ import javafx.util.Pair;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Simulator implements Runnable {
+public record Simulator(int steps) implements Runnable {
     private static List<Planet> planets;
     private static double valG;
-    private final int steps;
 
     public static void setPlanets(List<Planet> planets) {
         Simulator.planets = planets;
@@ -20,18 +19,17 @@ public class Simulator implements Runnable {
         Simulator.valG = valG;
     }
 
-    public Simulator(int steps) {
-        this.steps = steps;
-    }
-
     @Override
     public void run() {
         double tStep = 0.0001 * (101 - SettingsManager.getGlobalSettings().getAccuracy());
         for (int i = 0; i < steps && !Thread.interrupted(); i++) {
+            List<Pair<Planet, Pair<Vector2D, Vector2D>>> newPosVel = new ArrayList<>();
             for (Planet p1 : planets) {
                 if (p1.isStatic()) continue;
-                updatePath(p1, tStep);
+                if (p1.getPath().isBufferFull()) return;
+                newPosVel.add(new Pair<>(p1, updatePath(p1, tStep)));
             }
+            newPosVel.forEach(p -> p.getKey().getPath().addPosition(p.getValue().getKey(), p.getValue().getValue()));
         }
     }
 
@@ -41,6 +39,7 @@ public class Simulator implements Runnable {
     }
 
     private Pair<Vector2D, Vector2D> handleIntersects(Planet p1, List<Planet> intersect, Vector2D velocity, Vector2D accel) {
+        if (intersect.isEmpty()) return new Pair<>(velocity, accel);
         for (Planet p2 : intersect) {
             Vector2D r = p2.getPath().getLatestPosition().sub(p1.getPath().getLatestPosition());
             if (r.magnitude() == 0) {
@@ -53,7 +52,7 @@ public class Simulator implements Runnable {
         return new Pair<>(velocity, accel);
     }
 
-    private void updatePath(Planet p1, double tStep) {
+    private Pair<Vector2D, Vector2D> updatePath(Planet p1, double tStep) {
         Vector2D accel = new Vector2D();
         List<Planet> intersect = new ArrayList<>();
         for (Planet p2 : planets) {
@@ -73,6 +72,6 @@ public class Simulator implements Runnable {
         OrbitalPath path = p1.getPath();
         Vector2D position = path.getLatestPosition().add(path.getLatestVelocity().multiply(tStep)).add(accel.multiply(0.5 * tStep * tStep));
         velocity = velocity.add(accel.multiply(tStep));
-        path.addPosition(position, velocity);
+        return new Pair<>(position, velocity);
     }
 }

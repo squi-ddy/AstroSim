@@ -98,7 +98,7 @@ Simulator ScrollPane stuff
 */
 
 .simulator {
-    -fx-background-color: -background-color-1;
+    -fx-background-color: -theme-sky-color;
 }
 
 /*
@@ -258,6 +258,7 @@ Themed check box
     -fx-border-color: -theme-color-2;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
+    -fx-background-insets: 0;
     -fx-padding: 5;
 }
 
@@ -277,4 +278,59 @@ Themed check box
 .themed-check-box:selected > .box > .mark
 {
     -fx-background-color: -theme-text-color-1;
+}
+
+/*
+Themed choice box
+*/
+
+.themed-choice-box
+{
+    -fx-background-color: -theme-color-1;
+    -fx-border-color: -theme-color-2;
+    -fx-border-radius: 5;
+    -fx-background-insets: 0;
+    -fx-background-radius: 5;
+}
+
+.themed-choice-box > .open-button > .arrow
+{
+    -fx-background-color: -theme-text-color-1;
+}
+
+.themed-choice-box:focused,
+.themed-choice-box:showing,
+.themed-choice-box:armed
+{
+    -fx-background-color: -theme-color-1;
+    -fx-background-insets: 0;
+    -fx-background-radius: 0;
+}
+
+.themed-choice-box > .label
+{
+    -fx-text-fill: -theme-text-color-1;
+}
+
+.themed-choice-box .context-menu
+{
+    -fx-background-color: -theme-color-1;
+    -fx-border-color: -theme-color-2;
+    -fx-background-insets: 0;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 2.5;
+}
+
+/*
+Menu Item css (for choice box)
+*/
+
+.themed-choice-box .menu-item
+{
+    -fx-mark-color: -theme-text-color-2;
+    -fx-focused-mark-color: -theme-text-color-1;
+    -fx-text-base-color: -theme-text-color-2;
+    -fx-focused-text-base-color: -theme-text-color-1;
+    -fx-background: derive(-theme-color-1, 50%);
 }

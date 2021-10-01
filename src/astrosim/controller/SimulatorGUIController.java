@@ -180,18 +180,18 @@ public class SimulatorGUIController implements Initializable {
         if (taskRunning) return;
         taskRunning = true;
         ScenarioManager.getScenario().stopThread();
+        OrbitalPath.addPending(burstSteps);
         Platform.runLater(() -> {
             planetNodes.getPlanetList().forEach(p -> {
                 if (!p.getPlanet().isStatic()) {
-                    Platform.runLater(() -> {
                         p.getPlanet().getPath().addToTrail(burstSteps);
                         p.updatePlanet();
-                    });
                 }
             });
-            ScenarioManager.getScenario().simulateSteps(burstSteps + 10);
-            taskRunning = false;
+            OrbitalPath.removePending(burstSteps);
         });
+        ScenarioManager.getScenario().simulateSteps(burstSteps);
+        taskRunning = false;
     }
 
     public void setSpeed(int speedLevel) {
@@ -206,7 +206,7 @@ public class SimulatorGUIController implements Initializable {
         }
         if (speedLevel != 0) {
             simulator = Executors.newSingleThreadScheduledExecutor();
-            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) (101 - SettingsManager.getGlobalSettings().getAccuracy()) *  30 / speedLevel * burstSteps, TimeUnit.MICROSECONDS);
+            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) (101 - SettingsManager.getGlobalSettings().getAccuracy()) *  300 * burstSteps / speedLevel, TimeUnit.MICROSECONDS);
         }
         syncSpeedButtons();
     }
@@ -310,13 +310,13 @@ public class SimulatorGUIController implements Initializable {
             simulationInnerPane.layoutYProperty().addListener(listenerY);
             simulationPane.widthProperty().addListener(listenerX);
             simulationPane.heightProperty().addListener(listenerY);
-            FillTransition transition = new FillTransition(Duration.seconds(5 * Math.random() + 5));
+            FillTransition transition = new FillTransition(Duration.seconds(2 * Math.random() + 2));
             transition.setFromValue(Color.WHITE);
             transition.setToValue(Color.rgb(50, 50, 50));
             transition.setShape(speckle);
             transition.setAutoReverse(true);
             transition.setCycleCount(Animation.INDEFINITE);
-            transition.playFrom(Duration.seconds(5 * Math.random()));
+            transition.playFrom(Duration.seconds(2 * Math.random()));
             speckleGroup.getChildren().add(speckle);
         }
         simulationPane.getChildren().add(0, speckleGroup);

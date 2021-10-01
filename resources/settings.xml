@@ -9,5 +9,7 @@
         <positionGap>1000</positionGap>
         <sensitivity>100</sensitivity>
         <burstFactor>32</burstFactor>
+        <renderQuality>2</renderQuality>
+        <permanentTrail>false</permanentTrail>
     </settings>
 </astrosim>

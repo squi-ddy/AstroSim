@@ -39,9 +39,9 @@ public class Planet implements XMLHashable {
         this.isStatic = isStatic;
         this.name = name;
         this.path = new OrbitalPath(position, velocity);
-        this.path.setPlanet(this);
         this.color = color;
         this.trailColor = trailColor;
+        this.path.setPlanet(this);
     }
 
     public Planet() {

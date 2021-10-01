@@ -59,7 +59,7 @@ public class Scenario implements XMLHashable, Inspectable {
         stopThreadNow();
         planets.forEach(p -> p.getPath().clearBuffer());
         runner = Executors.newSingleThreadExecutor();
-        Simulator simulator = new Simulator(SettingsManager.getGlobalSettings().getMaxBufferInTrail());
+        Simulator simulator = new Simulator(OrbitalPath.getMaxBufferLength());
         runner.submit(simulator);
     }
 

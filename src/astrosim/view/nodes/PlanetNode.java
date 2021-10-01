@@ -1,7 +1,6 @@
 package astrosim.view.nodes;
 
 import astrosim.model.managers.SimulatorGUIManager;
-import astrosim.model.math.Vector2D;
 import astrosim.model.simulation.Planet;
 import astrosim.view.helpers.ThemeColors;
 import astrosim.view.nodes.inspector.*;
@@ -10,12 +9,7 @@ import javafx.animation.StrokeTransition;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.StrokeLineCap;
 import javafx.util.Duration;
 
 import java.util.ArrayList;
@@ -40,7 +34,7 @@ public class PlanetNode extends Group implements Inspectable {
         planetBody = new Circle();
         planetBody.setStroke(Color.TRANSPARENT);
         planetBody.strokeWidthProperty().bind(selectedWidth.divide(SimulatorGUIManager.scaleProperty()));
-        super.getChildren().add(planetBody);
+        super.getChildren().addAll(planet.getPath().getLine(), planetBody);
         updatePlanet();
         onHover.setFromValue(themeColor);
         onHover.setToValue(themeColor.deriveColor(1, 1, 1, 0.3));
@@ -70,40 +64,11 @@ public class PlanetNode extends Group implements Inspectable {
         return planet;
     }
 
-    public void updatePlanet(List<Vector2D> newTrail, double length) {
+    public void updatePlanet() {
         planetBody.setCenterX(planet.getPosition().getX());
         planetBody.setCenterY(planet.getPosition().getY());
         planetBody.setRadius(planet.getRadius());
         planetBody.setFill(Color.web(planet.getColor()));
-        if (!planet.isStatic()) drawLine(newTrail, length);
-    }
-
-    private void drawLine(List<Vector2D> newTrail, double trailLength) {
-        super.getChildren().removeIf(Line.class::isInstance);
-        if (trailLength == 0) return;
-        double currTrailLength = 0;
-        Vector2D last = newTrail.get(0);
-        for (int i = 1; i < newTrail.size(); i++) {
-            Vector2D last2 = newTrail.get(i);
-            Line line = new Line(last.getX(), last.getY(), last2.getX(), last2.getY());
-            line.setStrokeLineCap(StrokeLineCap.BUTT);
-            line.setStrokeWidth(planet.getRadius() * 0.5);
-            line.setStroke(new LinearGradient(0, 0, 1, 1, true, CycleMethod.NO_CYCLE,
-                    new Stop(0, Color.web(planet.getTrailColor()).deriveColor(1, 1, 1, getTransparency(currTrailLength / trailLength))),
-                    new Stop(1, Color.web(planet.getTrailColor()).deriveColor(1, 1, 1, getTransparency((currTrailLength + last2.sub(last).magnitude()) / trailLength)))
-            ));
-            super.getChildren().add(0, line);
-            currTrailLength += last2.sub(last).magnitude();
-            last = last2;
-        }
-    }
-
-    private double getTransparency(double interpolate) {
-        return interpolate * interpolate;
-    }
-
-    public void updatePlanet() {
-        updatePlanet(planet.getPath().getTrail(), planet.getPath().getTrailLength());
     }
 
     private void doOnSelect() {

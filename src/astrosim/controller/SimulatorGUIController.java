@@ -5,7 +5,7 @@ import astrosim.model.managers.ScenarioManager;
 import astrosim.model.managers.SettingsManager;
 import astrosim.model.managers.SimulatorGUIManager;
 import astrosim.model.math.Functions;
-import astrosim.model.math.Vector2D;
+import astrosim.model.simulation.OrbitalPath;
 import astrosim.model.simulation.Planet;
 import astrosim.model.simulation.Scenario;
 import astrosim.view.helpers.InspectablePlanetList;
@@ -79,8 +79,9 @@ public class SimulatorGUIController implements Initializable {
     private double currentScale = 1;
     private final InspectablePlanetList planetNodes = new InspectablePlanetList();
     private ScheduledExecutorService simulator = Executors.newSingleThreadScheduledExecutor();
-    private int burstSteps = (int) Math.ceil(SettingsManager.getGlobalSettings().getMaxBufferInTrail() / SettingsManager.getGlobalSettings().getBurstFactor());
+    private int burstSteps = (int) Math.ceil(OrbitalPath.getMaxBufferLength() / SettingsManager.getGlobalSettings().getBurstFactor());
     private final int[] speedValues = new int[]{0, 1, 3, 9};
+    private boolean taskRunning = false;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -176,13 +177,21 @@ public class SimulatorGUIController implements Initializable {
     }
 
     private void runSimulationGUI() {
+        if (taskRunning) return;
+        taskRunning = true;
         ScenarioManager.getScenario().stopThread();
-        planetNodes.getPlanetList().forEach(p -> {
-            if (!p.getPlanet().isStatic()) p.getPlanet().getPath().addToTrail(burstSteps);
-            List<Vector2D> trail = p.getPlanet().getPath().getTrail();
-            Platform.runLater(() -> p.updatePlanet(trail, p.getPlanet().getPath().getTrailLength()));
+        Platform.runLater(() -> {
+            planetNodes.getPlanetList().forEach(p -> {
+                if (!p.getPlanet().isStatic()) {
+                    Platform.runLater(() -> {
+                        p.getPlanet().getPath().addToTrail(burstSteps);
+                        p.updatePlanet();
+                    });
+                }
+            });
+            ScenarioManager.getScenario().simulateSteps(burstSteps + 10);
+            taskRunning = false;
         });
-        ScenarioManager.getScenario().simulateSteps(burstSteps + 10);
     }
 
     public void setSpeed(int speedLevel) {
@@ -197,7 +206,7 @@ public class SimulatorGUIController implements Initializable {
         }
         if (speedLevel != 0) {
             simulator = Executors.newSingleThreadScheduledExecutor();
-            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) 300 / speedLevel * burstSteps, TimeUnit.MICROSECONDS);
+            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) (101 - SettingsManager.getGlobalSettings().getAccuracy()) *  30 / speedLevel * burstSteps, TimeUnit.MICROSECONDS);
         }
         syncSpeedButtons();
     }
@@ -360,7 +369,9 @@ public class SimulatorGUIController implements Initializable {
     }
 
     public void setBurstFactor(double burstFactor) {
-        this.burstSteps = (int) Math.ceil(SettingsManager.getGlobalSettings().getMaxBufferInTrail() / burstFactor);
+        this.burstSteps = (int) Math.ceil(OrbitalPath.getMaxBufferLength() / burstFactor);
+        this.planetNodes.getPlanetList().forEach(p -> p.getPlanet().getPath().clearBuffer());
+        ScenarioManager.getScenario().startThread();
     }
 
     public void setDarkMode(boolean darkMode) {

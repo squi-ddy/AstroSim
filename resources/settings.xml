@@ -2,11 +2,11 @@
 <astrosim>
     <settings>
         <dark>true</dark>
-        <accuracy>10</accuracy>
+        <accuracy>50</accuracy>
         <lastSave>firstTime</lastSave>
         <bufferLen>3000</bufferLen>
-        <trailLen>150</trailLen>
-        <positionGap>500</positionGap>
+        <trailLen>50</trailLen>
+        <positionGap>1000</positionGap>
         <sensitivity>100</sensitivity>
         <burstFactor>32</burstFactor>
     </settings>

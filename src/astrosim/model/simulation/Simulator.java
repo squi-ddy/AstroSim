@@ -26,7 +26,7 @@ public class Simulator implements Runnable {
 
     @Override
     public void run() {
-        double tStep = 0.001 * (11 - SettingsManager.getGlobalSettings().getAccuracy()) / 10;
+        double tStep = 0.0001 * (101 - SettingsManager.getGlobalSettings().getAccuracy());
         for (int i = 0; i < steps && !Thread.interrupted(); i++) {
             for (Planet p1 : planets) {
                 if (p1.isStatic()) continue;

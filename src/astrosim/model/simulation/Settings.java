@@ -23,7 +23,7 @@ public class Settings implements XMLHashable, Inspectable {
     private int sensitivity;
 
     @SuppressWarnings("java:S107")
-    public Settings(short accuracy, String lastSave, int maxPointsInTrail, int maxBufferInTrail, int positionGapInTrail, boolean darkMode, double burstFactor, int sensitivity) {
+    public Settings(int accuracy, String lastSave, int maxPointsInTrail, int maxBufferInTrail, int positionGapInTrail, boolean darkMode, double burstFactor, int sensitivity) {
         this.accuracy = accuracy;
         this.lastSave = lastSave;
         this.maxPointsInTrail = maxPointsInTrail;
@@ -32,6 +32,7 @@ public class Settings implements XMLHashable, Inspectable {
         this.darkMode = darkMode;
         this.burstFactor = burstFactor;
         this.sensitivity = sensitivity;
+        setOrbitalPathConstants();
     }
 
     public void setDarkMode(boolean darkMode) {
@@ -45,25 +46,30 @@ public class Settings implements XMLHashable, Inspectable {
 
     public void setMaxBufferInTrail(int maxBufferInTrail) {
         this.maxBufferInTrail = maxBufferInTrail;
-        OrbitalPath.setMaxBufferLength(maxBufferInTrail);
+        setOrbitalPathConstants();
+        SimulatorGUIManager.getController().setBurstFactor(burstFactor);
     }
 
     public void setMaxPointsInTrail(int maxPointsInTrail) {
         this.maxPointsInTrail = maxPointsInTrail;
-        OrbitalPath.setMaxLength(maxPointsInTrail);
+        setOrbitalPathConstants();
     }
 
     public void setPositionGapInTrail(int positionGapInTrail) {
         this.positionGapInTrail = positionGapInTrail;
-        OrbitalPath.setPositionGap(positionGapInTrail);
+        setOrbitalPathConstants();
     }
 
-    public int getMaxBufferInTrail() {
-        return maxBufferInTrail;
+    public void setOrbitalPathConstants() {
+        OrbitalPath.setMaxBufferLength(maxBufferInTrail / (101 - accuracy));
+        OrbitalPath.setMaxLength(maxPointsInTrail);
+        OrbitalPath.setPositionGap(positionGapInTrail / (101 - accuracy));
     }
 
     public void setAccuracy(int accuracy) {
         this.accuracy = accuracy;
+        setOrbitalPathConstants();
+        SimulatorGUIManager.getController().setBurstFactor(burstFactor);
     }
 
     public void setSpeed(int speed) {
@@ -96,6 +102,7 @@ public class Settings implements XMLHashable, Inspectable {
 
     public void setBurstFactor(double burstFactor) {
         this.burstFactor = burstFactor;
+        setOrbitalPathConstants();
         SimulatorGUIManager.getController().setBurstFactor(burstFactor);
     }
 
@@ -109,13 +116,10 @@ public class Settings implements XMLHashable, Inspectable {
             short accuracy = Short.parseShort(settings.get("accuracy").getValue());
             String lastSave = (settings.get("lastSave").getValue().equals("null") ? null : settings.get("lastSave").getValue());
             int maxBufferInTrail = Integer.parseInt(settings.get("bufferLen").getValue());
-            OrbitalPath.setMaxBufferLength(maxBufferInTrail);
             int maxPointsInTrail = Integer.parseInt(settings.get("trailLen").getValue());
-            OrbitalPath.setMaxLength(maxPointsInTrail);
             boolean darkMode = Boolean.parseBoolean(settings.get("dark").getValue());
             int sensitivity = Integer.parseInt(settings.get("sensitivity").getValue());
             int positionGapInTrail = Integer.parseInt(settings.get("positionGap").getValue());
-            OrbitalPath.setPositionGap(positionGapInTrail);
             double burstFactor = Double.parseDouble(settings.get("burstFactor").getValue());
             return new Settings(accuracy, lastSave, maxPointsInTrail, maxBufferInTrail, positionGapInTrail, darkMode, burstFactor, sensitivity);
         } catch (XMLParseException | NumberFormatException | NullPointerException e) {
@@ -140,9 +144,9 @@ public class Settings implements XMLHashable, Inspectable {
     @Override
     public List<InspectorSetting<?>> getSettings() {
         List<InspectorSetting<?>> settings = new ArrayList<>();
-        settings.add(new IntegerInspectorSetting("Accuracy", accuracy, this::setAccuracy, a -> a != null && 0 <= a && a <= 10));
+        settings.add(new IntegerInspectorSetting("Accuracy (%)", accuracy, this::setAccuracy, a -> a != null && 0 < a && a <= 100));
         settings.add(new IntegerInspectorSetting("Trail Length", maxPointsInTrail, this::setMaxPointsInTrail, a -> a != null && a >= 0));
-        settings.add(new IntegerInspectorSetting("Buffer Length", maxBufferInTrail, this::setMaxBufferInTrail, a -> a != null && a >= 0));
+        settings.add(new IntegerInspectorSetting("Buffer Length", maxBufferInTrail, this::setMaxBufferInTrail, a -> a != null && a >= 50));
         settings.add(new IntegerInspectorSetting("Trail Gap", positionGapInTrail, this::setPositionGapInTrail, a -> a != null && a >= 0));
         settings.add(new DoubleInspectorSetting("Burst Factor", burstFactor, this::setBurstFactor, f -> f != null && f > 0));
         settings.add(new BooleanInspectorSetting("Dark Mode", darkMode, this::setDarkMode));

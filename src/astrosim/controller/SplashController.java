@@ -75,9 +75,8 @@ public class SplashController implements Initializable {
                     });
                 }
                 else {
-                    statusFlash.stop();
-                    SettingsManager.getGlobalSettings().setLastSave(null);
-                    loadFile();
+                    SettingsManager.getGlobalSettings().setLastSave("firstTime");
+                    Platform.runLater(this::loadFile);
                 }
             }).start();
         } else {
@@ -87,7 +86,10 @@ public class SplashController implements Initializable {
                     copyAllDefaults();
                 }
                 ScenarioManager.waitUntilInit();
-                Platform.runLater(() -> loadScenarioChooser(false));
+                Platform.runLater(() -> {
+                    statusFlash.stop();
+                    loadScenarioChooser(false);
+                });
             }).start();
         }
     }

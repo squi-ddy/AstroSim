@@ -150,7 +150,7 @@ public class Settings implements XMLHashable, Inspectable {
     @Override
     public List<InspectorSetting<?>> getSettings() {
         List<InspectorSetting<?>> settings = new ArrayList<>();
-        settings.add(new IntegerInspectorSetting("Accuracy (%)", accuracy, this::setAccuracy, a -> a != null && 0 < a && a <= 100));
+        settings.add(new IntegerInspectorSetting("Accuracy", accuracy, this::setAccuracy, a -> a != null && 0 < a && a <= 100));
         settings.add(new IntegerInspectorSetting("Trail Length", maxPointsInTrail, this::setMaxPointsInTrail, a -> a != null && a >= 0));
         settings.add(new IntegerInspectorSetting("Buffer Length", maxBufferInTrail, this::setMaxBufferInTrail, a -> a != null && a >= 50));
         settings.add(new IntegerInspectorSetting("Trail Gap", positionGapInTrail, this::setPositionGapInTrail, a -> a != null && a >= 0));

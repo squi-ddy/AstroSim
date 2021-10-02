@@ -89,6 +89,7 @@ public class Trail extends Group {
             dynamicTrailWrapper.setVisible(false);
             permanentTrail.setManaged(true);
             permanentTrail.setVisible(true);
+            clearTrail();
         } else {
             permanentTrail.setManaged(false);
             permanentTrail.setVisible(false);

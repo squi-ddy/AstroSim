@@ -93,6 +93,7 @@ public class ScenarioManager {
             Stage stage = new Stage();
             Parent root = FXMLLoader.load(Objects.requireNonNull(Main.class.getResource("/view/fxml/simulator.fxml")));
             root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (SettingsManager.getGlobalSettings().isDarkMode() ? "dark.css" : "light.css"))).toExternalForm());
+            root.requestFocus();
             Scene scene = new Scene(root);
             stage.getIcons().add(new Image(Objects.requireNonNull(Main.class.getResourceAsStream("/images/icon.png"))));
             stage.setScene(scene);
@@ -102,6 +103,8 @@ public class ScenarioManager {
             stage.showAndWait();
             SimulatorGUIManager.getController().setSpeed(0);
             SimulatorGUIManager.scaleProperty().set(1);
+            scenario.stopThreadNow();
+            scenario = null;
         } catch (IOException e) {
             e.printStackTrace();
         }

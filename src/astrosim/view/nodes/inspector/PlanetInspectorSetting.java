@@ -20,8 +20,9 @@ public class PlanetInspectorSetting extends InspectorSetting<PlanetNode> {
         zoomButton.setGraphic(zoomPath);
         zoomButton.setOnAction(e -> SimulatorGUIManager.getController().moveTo(setting.getPlanet()));
         Button delPlanet = new Button();
+        Button followButton = new Button();
         SVGPath xSymbolShape = new SVGPath();
-        HBox wrapper = new HBox(zoomButton, delPlanet);
+        HBox wrapper = new HBox(zoomButton, delPlanet, followButton);
         wrapper.setSpacing(5);
         this.toDisplay = new Group(wrapper);
         xSymbolShape.setContent("M 5 5 L -5 -5 M -5 5 L 5 -5");
@@ -32,6 +33,12 @@ public class PlanetInspectorSetting extends InspectorSetting<PlanetNode> {
             SimulatorGUIManager.getController().deletePlanet(setting);
             SimulatorGUIManager.getOpenInspector().removeSetting(this);
         });
+        SVGPath cameraSymbolShape = new SVGPath();
+        cameraSymbolShape.setContent("M 3 -6 V 6 H 20 V -6 H 3 M 19 0 L 27 -5 V 5 Z");
+        cameraSymbolShape.setStyle("-fx-stroke-width: 1; -fx-stroke-line-cap: round;");
+        followButton.setGraphic(cameraSymbolShape);
+        followButton.getStyleClass().add("themed-button");
+        followButton.setOnAction(e -> SimulatorGUIManager.getController().follow(setting));
     }
 
     @Override

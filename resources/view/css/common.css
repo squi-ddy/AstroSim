@@ -334,3 +334,27 @@ Menu Item css (for choice box)
     -fx-focused-text-base-color: -theme-text-color-1;
     -fx-background: derive(-theme-color-1, 50%);
 }
+
+/*
+The help menu VBoxes
+*/
+.help-popup
+{
+    -fx-background-color: -theme-color-1;
+    -fx-border-color: -theme-color-2;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+    -fx-padding: 10;
+}
+
+.help-popup > .text-flow > .normal-label,
+.help-popup > .normal-label
+{
+    -fx-text-fill: -theme-text-color-1;
+}
+
+.help-popup > .text-flow > .bold-label
+{
+    -fx-font-weight: bold;
+    -fx-text-fill: -theme-color-2;
+}

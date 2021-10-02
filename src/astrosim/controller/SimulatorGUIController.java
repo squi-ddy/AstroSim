@@ -9,6 +9,7 @@ import astrosim.model.simulation.OrbitalPath;
 import astrosim.model.simulation.Planet;
 import astrosim.model.simulation.Scenario;
 import astrosim.view.helpers.InspectablePlanetList;
+import astrosim.view.helpmenu.HelpMenu;
 import astrosim.view.nodes.PlanetNode;
 import astrosim.view.nodes.inspector.Inspectable;
 import astrosim.view.nodes.inspector.InspectorPane;
@@ -27,6 +28,7 @@ import javafx.scene.Cursor;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -43,6 +45,8 @@ import java.util.ResourceBundle;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static javafx.scene.input.KeyEvent.KEY_PRESSED;
 
 public class SimulatorGUIController implements Initializable {
     @FXML
@@ -82,6 +86,7 @@ public class SimulatorGUIController implements Initializable {
     private int burstSteps = (int) Math.ceil(OrbitalPath.getMaxBufferLength() / SettingsManager.getGlobalSettings().getBurstFactor());
     private final int[] speedValues = new int[]{0, 1, 3, 9};
     private boolean taskRunning = false;
+    private PlanetNode following;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -109,6 +114,7 @@ public class SimulatorGUIController implements Initializable {
                 new Menu("Objects", objectMenu, root),
                 new Menu("Settings", settingsMenu, root)
         );
+        new HelpMenu(root, menuBar);
         setUpSimulator();
         SimulatorGUIManager.setController(this);
         InspectorPane inspector = SimulatorGUIManager.getInspector();
@@ -188,6 +194,7 @@ public class SimulatorGUIController implements Initializable {
                         p.updatePlanet();
                 }
             });
+            SimulatorGUIManager.getController().updateFollowCamera();
             OrbitalPath.removePending(burstSteps);
         });
         ScenarioManager.getScenario().simulateSteps(burstSteps);
@@ -227,6 +234,7 @@ public class SimulatorGUIController implements Initializable {
         simulationInnerPane.getTransforms().add(new Scale());
         simulationPane.setOnMousePressed(e -> simulationPane.getScene().setCursor(Cursor.MOVE));
         simulationPane.setOnMouseDragged(e -> {
+            this.following = null;
             if (lastX != null) {
                 simulationInnerPane.setLayoutX(simulationInnerPane.getLayoutX() + e.getX() - lastX);
                 simulationInnerPane.setLayoutY(simulationInnerPane.getLayoutY() + e.getY() - lastY);
@@ -234,6 +242,7 @@ public class SimulatorGUIController implements Initializable {
             lastX = e.getX();
             lastY = e.getY();
         });
+        doKeyPressFilters();
         simulationPane.setOnMouseReleased(e -> {
             lastX = null;
             lastY = null;
@@ -250,8 +259,14 @@ public class SimulatorGUIController implements Initializable {
             if (!simulationInnerPane.getTransforms().contains(scale)) simulationInnerPane.getTransforms().add(scale);
             double direction = e.getDeltaX() * e.getMultiplierX();
             if (direction == 0) direction = -e.getDeltaY() * e.getMultiplierY();
-            Point2D trueMouseCoordinates = invertTransforms(new Point2D(e.getX() - simulationInnerPane.getLayoutX(), e.getY() - simulationInnerPane.getLayoutY()));
-            scaleScenario(direction * SettingsManager.getGlobalSettings().getSensitivity() / 2500000, trueMouseCoordinates.getX(), trueMouseCoordinates.getY());
+            Point2D trueMouseCoordinates = invertTransforms(new Point2D(
+                    e.getX() - simulationInnerPane.getLayoutX(),
+                    e.getY() - simulationInnerPane.getLayoutY()));
+            scaleScenario(
+                    direction * SettingsManager.getGlobalSettings().getSensitivity() / 2500000,
+                    trueMouseCoordinates.getX(),
+                    trueMouseCoordinates.getY()
+            );
         });
         simulationPane.setOnScrollFinished(e -> combineTransforms());
         doSimulatorClip();
@@ -260,17 +275,28 @@ public class SimulatorGUIController implements Initializable {
         renderScenario();
     }
 
+    private void doKeyPressFilters() {
+        root.addEventFilter(KEY_PRESSED, e -> {
+            if (e.getCode() == KeyCode.TAB) {
+                if (planetNodes.getPlanetList().isEmpty()) return;
+                int next = 0;
+                if (following != null) next = (int) Math.round(Functions.modulo(planetNodes.getPlanetList().indexOf(following) + 1., planetNodes.getPlanetList().size()));
+                follow(planetNodes.getPlanetList().get(next));
+            }
+        });
+    }
+
     private void scaleScenario(double deltaPercent, double scaleFromX, double scaleFromY) {
-        if (scaleFromX != scale.getPivotX() || scaleFromY != scale.getPivotY()) {
+        if (following == null && (scaleFromX != scale.getPivotX() || scaleFromY != scale.getPivotY())) {
             combineTransforms();
             simulationInnerPane.getTransforms().add(scale);
+            scale.setPivotX(scaleFromX);
+            scale.setPivotY(scaleFromY);
         }
         double scaleBy = Math.max(currentScale * scale.getX() - deltaPercent, 0.01) / currentScale;
         SimulatorGUIManager.scaleProperty().set(currentScale * scaleBy);
         long zoom = Math.round(currentScale * scaleBy * 1000);
         zoomLabel.setText(String.valueOf(zoom / 10) + '.' + zoom % 10);
-        scale.setPivotX(scaleFromX);
-        scale.setPivotY(scaleFromY);
         scale.setX(scaleBy);
         scale.setY(scaleBy);
     }
@@ -338,16 +364,21 @@ public class SimulatorGUIController implements Initializable {
         simulationInnerPane.getTransforms().add(transform);
     }
 
+    public void moveTo(Planet planet, double zoom) {
+        simulationInnerPane.setLayoutX(simulationPane.getWidth() / 2 - planet.getPosition().getX());
+        simulationInnerPane.setLayoutY(simulationPane.getHeight() / 2 - planet.getPosition().getY());
+        clearTransforms();
+        scale.setPivotX(planet.getPosition().getX());
+        scale.setPivotY(planet.getPosition().getY());
+        scale.setX(zoom);
+        scale.setY(zoom);
+        currentScale = 1;
+        SimulatorGUIManager.scaleProperty().set(zoom);
+    }
+
     public void moveTo(Planet planet) {
-        Point2D coordinates = applyTransforms(planet.getPosition().toPoint2D());
-        simulationInnerPane.setLayoutX(simulationPane.getWidth() / 2 - coordinates.getX());
-        simulationInnerPane.setLayoutY(simulationPane.getHeight() / 2 - coordinates.getY());
-        // Scale for the new planet to fit exactly 10% of scenario space
-        double zoom = 0.05 * Math.min(simulationPane.getWidth(), simulationPane.getHeight()) / planet.getRadius();
-        combineTransforms();
-        scale.setPivotX(planet.getPosition().getX() + 1);
-        scale.setPivotY(planet.getPosition().getY() + 1);
-        scaleScenario(scale.getX() * currentScale - zoom, planet.getPosition().getX(), planet.getPosition().getY());
+        following = null;
+        moveTo(planet, 0.05 * Math.min(simulationPane.getWidth(), simulationPane.getHeight()) / planet.getRadius());
     }
 
     public Point2D invertTransforms(Point2D coordinates) {
@@ -357,13 +388,6 @@ public class SimulatorGUIController implements Initializable {
             } catch (NonInvertibleTransformException ex) {
                 ex.printStackTrace();
             }
-        }
-        return coordinates;
-    }
-
-    public Point2D applyTransforms(Point2D coordinates) {
-        for (Transform t : simulationInnerPane.getTransforms()) {
-            coordinates = t.transform(coordinates);
         }
         return coordinates;
     }
@@ -381,6 +405,22 @@ public class SimulatorGUIController implements Initializable {
             root.getStylesheets().removeIf(s -> s.contains("dark"));
         }
         root.getStylesheets().add(Objects.requireNonNull(Main.class.getResource("/view/css/" + (darkMode ? "dark.css" : "light.css"))).toExternalForm());
+    }
 
+    private void clearTransforms() {
+        scale = new Scale();
+        simulationInnerPane.getTransforms().clear();
+        simulationInnerPane.getTransforms().add(scale);
+    }
+
+    public void follow(PlanetNode planet) {
+        if (!planetNodes.getPlanetList().contains(planet)) throw new IllegalArgumentException();
+        this.following = planet;
+        moveTo(planet.getPlanet(), currentScale * scale.getX());
+    }
+
+    public void updateFollowCamera() {
+        if (following == null) return;
+        moveTo(following.getPlanet(), currentScale * scale.getX());
     }
 }

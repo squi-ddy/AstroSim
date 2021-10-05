@@ -86,8 +86,8 @@ public class PlanetNode extends Group implements Inspectable {
     public List<InspectorSetting<?>> getSettings() {
         List<InspectorSetting<?>> settings = new ArrayList<>();
         settings.add(new StringInspectorSetting("Name", planet.getName(), planet::setName, s -> true));
-        settings.add(new StringInspectorSetting("Fill", planet.getColor(), planet::setColor, s -> s.matches("#[0-9a-fA-F]{6}")));
-        settings.add(new StringInspectorSetting("Trail", planet.getTrailColor(), planet::setTrailColor, s -> s.matches("#[0-9a-fA-F]{6}")));
+        settings.add(new ColorInspectorSetting("Fill", planet.getColor(), planet::setColor));
+        settings.add(new ColorInspectorSetting("Trail", planet.getTrailColor(), planet::setTrailColor));
         settings.add(new DoubleInspectorSetting("Mass", planet.getMass(), planet::setMass, s -> s != null && s >= 0));
         settings.add(new DoubleInspectorSetting("Radius", planet.getRadius(), planet::setRadius, s -> s != null && s > 0));
         settings.add(new Vector2DInspectorSetting("Position", planet.getPosition(), v -> planet.setPosition(v, planet.getVelocity()), Objects::nonNull));

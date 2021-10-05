@@ -17,6 +17,9 @@ public class StringInspectorSetting extends InspectorSetting<String> {
         entryField.setText(setting);
         this.toDisplay = new Group(entryField);
         this.entryField.getStyleClass().add("themed-text-field");
+        entryField.setPrefWidth(175);
+        entryField.setMinWidth(entryField.getPrefWidth());
+        entryField.setMinWidth(entryField.getPrefWidth());
     }
 
     @Override

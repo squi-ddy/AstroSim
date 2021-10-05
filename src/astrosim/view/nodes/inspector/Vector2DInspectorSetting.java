@@ -43,11 +43,19 @@ public class Vector2DInspectorSetting extends InspectorSetting<Vector2D> {
         this.toDisplay.add(xLabel, 0, 0);
         this.toDisplay.add(yLabel, 0, 1);
         ColumnConstraints constraints = new ColumnConstraints();
-        constraints.setPercentWidth(10);
+        constraints.setPrefWidth(15);
+        constraints.setMinWidth(15);
+        constraints.setMaxWidth(15);
         constraints.setHalignment(HPos.RIGHT);
         ColumnConstraints constraints1 = new ColumnConstraints();
         constraints1.setHalignment(HPos.CENTER);
         this.toDisplay.getColumnConstraints().addAll(constraints, constraints1);
+        entryFieldX.setPrefWidth(150);
+        entryFieldX.setMinWidth(entryFieldX.getPrefWidth());
+        entryFieldX.setMinWidth(entryFieldX.getPrefWidth());
+        entryFieldY.setPrefWidth(150);
+        entryFieldY.setMinWidth(entryFieldY.getPrefWidth());
+        entryFieldY.setMinWidth(entryFieldY.getPrefWidth());
     }
 
     @Override

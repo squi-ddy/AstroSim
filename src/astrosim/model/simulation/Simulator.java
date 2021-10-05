@@ -46,8 +46,8 @@ public record Simulator(int steps) implements Runnable {
                 double angle = Math.random() * 2 * Math.PI;
                 r = new Vector2D(Math.sin(angle), Math.cos(angle)).multiply(0.01);
             }
-            accel = accel.sub(r.normalise().multiply(accel.dot(r.normalise()) + 5 * (p1.getRadius() + p2.getRadius() - r.magnitude())));
-            velocity = velocity.sub(r.normalise().multiply(velocity.dot(r.normalise()) + 5 * (p1.getRadius() + p2.getRadius() - r.magnitude())));
+            accel = accel.sub(r.normalise().multiply(accel.dot(r.normalise()) + 10 * (p1.getRadius() + p2.getRadius() - r.magnitude())));
+            velocity = velocity.sub(r.normalise().multiply(velocity.dot(r.normalise()) + 10 * (p1.getRadius() + p2.getRadius() - r.magnitude())));
         }
         return new Pair<>(velocity, accel);
     }

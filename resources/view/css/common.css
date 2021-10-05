@@ -336,24 +336,27 @@ Menu Item css (for choice box)
 }
 
 /*
-The help menu VBoxes
+Popups
 */
-.help-popup
+.popup
 {
     -fx-background-color: -theme-color-1;
     -fx-border-color: -theme-color-2;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
-    -fx-padding: 10 10 2 10;
+    -fx-padding: 10 10 10 10;
 }
 
-.help-popup > .text-flow > .normal-label,
-.help-popup > .normal-label
+/*
+Help Pop-up labels
+*/
+
+.help-normal-label
 {
     -fx-text-fill: -theme-text-color-1;
 }
 
-.help-popup > .text-flow > .bold-label
+.help-bold-label
 {
     -fx-font-weight: bold;
     -fx-text-fill: -theme-color-2;

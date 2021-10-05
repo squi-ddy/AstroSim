@@ -60,14 +60,14 @@
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/bin/ucrtbase.dll" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/bin/vcruntime140.dll" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/bin/vcruntime140_1.dll" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx-swt.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.base.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.controls.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.fxml.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.graphics.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.media.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.swing.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.web.jar" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx-swt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.base.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.controls.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.fxml.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.graphics.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.media.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.swing.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-windows/lib/javafx.web.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

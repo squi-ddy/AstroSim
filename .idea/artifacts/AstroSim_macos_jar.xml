@@ -3,14 +3,6 @@
     <output-path>$PROJECT_DIR$/out/artifacts/AstroSim</output-path>
     <root id="archive" name="AstroSim-macos.jar">
       <element id="module-output" name="AstroSim" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx-swt.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.base.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.controls.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.fxml.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.graphics.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.media.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.swing.jar" />
-      <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.web.jar" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/libdecora_sse.dylib" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/libfxplugins.dylib" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/libglass.dylib" />
@@ -24,6 +16,14 @@
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/libprism_common.dylib" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/libprism_es2.dylib" />
       <element id="file-copy" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/libprism_sw.dylib" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx-swt.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.base.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.controls.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.fxml.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.graphics.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.media.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.swing.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$USER_HOME$/Documents/javafx-sdk/javafx-sdk-16-macos/lib/javafx.web.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

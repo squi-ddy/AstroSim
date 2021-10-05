@@ -49,6 +49,7 @@ public class ScenarioManager {
         try {
             Files.delete(ResourceManager.getPath("saves/" + name));
             SettingsManager.getGlobalSettings().setLastSave(null);
+            scenario.stopThreadNow();
             scenario = null;
         } catch (IOException e) {
             e.printStackTrace();
@@ -103,7 +104,7 @@ public class ScenarioManager {
             stage.showAndWait();
             SimulatorGUIManager.getController().setSpeed(0);
             SimulatorGUIManager.scaleProperty().set(1);
-            scenario.stopThreadNow();
+            if (scenario != null) scenario.stopThreadNow();
             scenario = null;
         } catch (IOException e) {
             e.printStackTrace();

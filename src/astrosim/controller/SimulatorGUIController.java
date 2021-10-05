@@ -105,6 +105,7 @@ public class SimulatorGUIController implements Initializable {
         fileMenu.add(new MenuItem("Save As", () -> doSave(true)));
         fileMenu.add(new MenuItem("Delete", this::doDelete));
         objectMenu.add(new MenuItem("Create new Planet", this::newPlanet));
+        objectMenu.add(new MenuItem("Clear Permanent Trails", this::clearTrails));
         objectMenu.add(MenuItem.SPACING);
         objectMenu.add(new MenuItem("See all Planets", this::zoomOnPlanetPane));
         settingsMenu.add(new MenuItem("Global", this::globalSettings));
@@ -122,6 +123,10 @@ public class SimulatorGUIController implements Initializable {
         AnchorPane.setRightAnchor(inspector, 0.);
         AnchorPane.setBottomAnchor(inspector, 0.);
         inspectorParentPane.getChildren().add(inspector);
+    }
+
+    private void clearTrails() {
+        planetNodes.getPlanetList().forEach(p -> p.getPlanet().getPath().getTrail().clearPermanentTrail());
     }
 
     private void simulationSettings() {
@@ -197,7 +202,7 @@ public class SimulatorGUIController implements Initializable {
             SimulatorGUIManager.getController().updateFollowCamera();
             OrbitalPath.removePending(burstSteps);
         });
-        ScenarioManager.getScenario().simulateSteps(burstSteps);
+        ScenarioManager.getScenario().simulateSteps(burstSteps + 10);
         taskRunning = false;
     }
 

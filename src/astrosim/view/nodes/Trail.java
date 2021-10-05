@@ -140,7 +140,7 @@ public class Trail extends Group {
         }
     }
 
-    public void resetPermanentTrail() {
+    public void clearPermanentTrail() {
         double lastX = permanentTrail.getPoints().get(permanentTrail.getPoints().size() - 2);
         double lastY = permanentTrail.getPoints().get(permanentTrail.getPoints().size() - 1);
         permanentTrail.getPoints().clear();
@@ -148,11 +148,10 @@ public class Trail extends Group {
     }
 
     public void addPointToTrail(Vector2D end) {
-        if (!showing) return;
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 2, end.getX());
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 1, end.getY());
         permanentTrail.getPoints().addAll(end.getX(), end.getY());
-        if (showingPermanent) return;
+        if (showingPermanent || !showing) return;
         numPoints++;
         if (isPolyline) {
             Polyline line = (Polyline) trailLines.getLast();

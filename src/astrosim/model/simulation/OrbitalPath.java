@@ -103,7 +103,7 @@ public class OrbitalPath implements XMLHashable {
         lastPosVel = new Pair<>(position, velocity);
         untilNextAdd = 0;
         trail.clearTrail();
-        trail.resetPermanentTrail();
+        trail.clearPermanentTrail();
     }
 
     public void addToTrail(int steps) {

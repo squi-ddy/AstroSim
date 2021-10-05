@@ -26,6 +26,7 @@ public class Main extends Application {
         scene.setFill(Color.TRANSPARENT);
         stage.getIcons().add(new Image(Objects.requireNonNull(getClass().getResourceAsStream("/images/icon.png"))));
         stage.show();
+        System.getLogger("Logger").log(System.Logger.Level.INFO,"AstroSim started");
     }
 
     public static void main(String[] args) {

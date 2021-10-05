@@ -229,17 +229,15 @@ public class Trail extends Group {
         trailLength = 0;
         numPoints = 1;
         if (isPolyline) {
-            if (!(trailLines.getLast() instanceof Polyline)) clearTrail();
+            if (!(trailLines.getLast() instanceof Polyline)) setupTrailLines(path.getPosition());
             Polyline line = (Polyline) trailLines.getLast();
-            double lastX = line.getPoints().get(line.getPoints().size() - 2);
-            double lastY = line.getPoints().get(line.getPoints().size() - 1);
+            double lastX = path.getPosition().getX();
+            double lastY = path.getPosition().getY();
             line.getPoints().clear();
             line.getPoints().addAll(lastX, lastY, lastX, lastY);
         } else {
-            if (!(trailLines.getLast() instanceof Line)) clearTrail();
-            Line last = (Line) trailLines.getLast();
             trailLines.clear();
-            trailLines.add(new Line(last.getEndX(), last.getEndY(), last.getEndX(), last.getEndY()));
+            trailLines.add(new Line(path.getPosition().getX(), path.getPosition().getY(), path.getPosition().getX(), path.getPosition().getY()));
         }
         dynamicTrailWrapper.getChildren().setAll(trailLines);
     }

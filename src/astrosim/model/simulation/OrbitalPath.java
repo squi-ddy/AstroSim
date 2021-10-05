@@ -50,10 +50,10 @@ public class OrbitalPath implements XMLHashable {
     }
 
     public OrbitalPath(Vector2D position, Vector2D velocity, boolean showing) {
-        this.trail = new Trail(position, this, showing);
         this.positionBuffer = new ArrayDeque<>();
         this.velocityBuffer = new ArrayDeque<>();
         this.lastPosVel = new Pair<>(position, velocity);
+        this.trail = new Trail(position, this, showing);
     }
 
     public OrbitalPath() {this(new Vector2D(), new Vector2D(), true);}
@@ -107,7 +107,7 @@ public class OrbitalPath implements XMLHashable {
     }
 
     public void addToTrail(int steps) {
-        if (steps > positionBuffer.size()) throw new IllegalArgumentException();
+        if (steps > positionBuffer.size()) System.getLogger("Logger").log(System.Logger.Level.WARNING,"Buffer empty!");
         for (int i = 0; i < steps; i++) {
             if (untilNextAdd == 0) {
                 trail.addPointToTrail(positionBuffer.getFirst());

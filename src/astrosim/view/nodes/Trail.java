@@ -23,6 +23,7 @@ public class Trail extends Group {
     private Color color;
     private double trailLength;
     private int numPoints;
+    private boolean showing;
 
     private static boolean isPolyline = false;
     private static boolean stepwise = false;
@@ -55,7 +56,8 @@ public class Trail extends Group {
         return 2;
     }
 
-    public Trail(Vector2D position, OrbitalPath path) {
+    public Trail(Vector2D position, OrbitalPath path, boolean showing) {
+        this.showing = showing;
         this.path = path;
         numPoints = 1;
         trailLength = 0;
@@ -84,12 +86,18 @@ public class Trail extends Group {
     }
 
     private void manageShowing() {
-        if (showingPermanent) {
+        clearTrail();
+        if (!showing) {
+            dynamicTrailWrapper.setManaged(false);
+            dynamicTrailWrapper.setVisible(false);
+            permanentTrail.setVisible(false);
+            permanentTrail.setManaged(false);
+        }
+        else if (showingPermanent) {
             dynamicTrailWrapper.setManaged(false);
             dynamicTrailWrapper.setVisible(false);
             permanentTrail.setManaged(true);
             permanentTrail.setVisible(true);
-            clearTrail();
         } else {
             permanentTrail.setManaged(false);
             permanentTrail.setVisible(false);
@@ -140,6 +148,7 @@ public class Trail extends Group {
     }
 
     public void addPointToTrail(Vector2D end) {
+        if (!showing) return;
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 2, end.getX());
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 1, end.getY());
         permanentTrail.getPoints().addAll(end.getX(), end.getY());
@@ -179,6 +188,7 @@ public class Trail extends Group {
     }
 
     public void changePoint(Vector2D end) {
+        if (!showing) return;
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 2, end.getX());
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 1, end.getY());
         if (showingPermanent) return;
@@ -194,7 +204,7 @@ public class Trail extends Group {
     }
 
     public void deletePointFromTrail() {
-        if (showingPermanent) return;
+        if (showingPermanent || !showing) return;
         numPoints--;
         if (isPolyline) {
             Polyline line = (Polyline) trailLines.getLast();
@@ -211,7 +221,6 @@ public class Trail extends Group {
     }
 
     public void clearTrail() {
-        if (showingPermanent) return;
         trailLength = 0;
         numPoints = 1;
         if (isPolyline) {
@@ -225,9 +234,19 @@ public class Trail extends Group {
             trailLines.clear();
             trailLines.add(new Line(last.getEndX(), last.getEndY(), last.getEndX(), last.getEndY()));
         }
+        dynamicTrailWrapper.getChildren().setAll(trailLines);
     }
 
     public int getNumPoints() {
         return numPoints;
+    }
+
+    public void setShowing(boolean showing) {
+        this.showing = showing;
+        manageShowing();
+    }
+
+    public boolean isShowing() {
+        return showing;
     }
 }

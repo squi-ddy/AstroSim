@@ -34,7 +34,7 @@ public class PlanetNode extends Group implements Inspectable {
         planetBody = new Circle();
         planetBody.setStroke(Color.TRANSPARENT);
         planetBody.strokeWidthProperty().bind(selectedWidth.divide(SimulatorGUIManager.scaleProperty()));
-        super.getChildren().addAll(planet.getPath().getLine(), planetBody);
+        super.getChildren().addAll(planet.getPath().getTrail(), planetBody);
         updatePlanet();
         onHover.setFromValue(themeColor);
         onHover.setToValue(themeColor.deriveColor(1, 1, 1, 0.3));
@@ -93,6 +93,7 @@ public class PlanetNode extends Group implements Inspectable {
         settings.add(new Vector2DInspectorSetting("Position", planet.getPosition(), v -> planet.setPosition(v, planet.getVelocity()), Objects::nonNull));
         settings.add(new Vector2DInspectorSetting("Velocity", planet.getVelocity(), v -> planet.setPosition(planet.getPosition(), v), Objects::nonNull));
         settings.add(new BooleanInspectorSetting("Static", planet.isStatic(), planet::setStatic));
+        settings.add(new BooleanInspectorSetting("Show Trail", planet.getPath().getTrail().isShowing(), planet.getPath().getTrail()::setShowing));
         return settings;
     }
 

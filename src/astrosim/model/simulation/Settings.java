@@ -157,13 +157,13 @@ public class Settings implements XMLHashable, Inspectable {
         settings.add(new DoubleInspectorSetting("Burst Factor", burstFactor, this::setBurstFactor, f -> f != null && f > 0));
         settings.add(new IntegerInspectorSetting("Sensitivity", sensitivity, this::setSensitivity, s -> s != null && s > 0));
         settings.add(new ListInspectorSetting("Graphics", Trail.getGraphicMode(), Trail::setGraphicMode, List.of("Low", "Medium", "High")));
-        settings.add(new BooleanInspectorSetting("Draw Trails", Trail.isShowingPermanent(), Trail::setShowingPermanent));
+        settings.add(new BooleanInspectorSetting("Permanent Trails", Trail.isShowingPermanent(), Trail::setShowingPermanent));
         settings.add(new BooleanInspectorSetting("Dark Mode", darkMode, this::setDarkMode));
         return settings;
     }
 
     @Override
     public void onClose() {
-        ScenarioManager.getScenario().getPlanets().forEach(p -> p.getPath().getLine().updateGlobalSettings());
+        ScenarioManager.getScenario().getPlanets().forEach(p -> p.getPath().getTrail().updateGlobalSettings());
     }
 }

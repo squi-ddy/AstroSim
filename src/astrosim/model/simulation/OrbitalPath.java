@@ -49,12 +49,14 @@ public class OrbitalPath implements XMLHashable {
         trail.setColor(Color.web(planet.getTrailColor()));
     }
 
-    public OrbitalPath(Vector2D position, Vector2D velocity) {
-        this.trail = new Trail(position, this);
+    public OrbitalPath(Vector2D position, Vector2D velocity, boolean showing) {
+        this.trail = new Trail(position, this, showing);
         this.positionBuffer = new ArrayDeque<>();
         this.velocityBuffer = new ArrayDeque<>();
         this.lastPosVel = new Pair<>(position, velocity);
     }
+
+    public OrbitalPath() {this(new Vector2D(), new Vector2D(), true);}
 
     public void addPosition(Vector2D pos, Vector2D vel) {
         if (positionBuffer.size() < maxBufferLength + pending) {
@@ -73,7 +75,7 @@ public class OrbitalPath implements XMLHashable {
         untilNextAdd = 0;
     }
 
-    public Trail getLine() {
+    public Trail getTrail() {
         return trail;
     }
 
@@ -125,6 +127,7 @@ public class OrbitalPath implements XMLHashable {
         HashMap<String, XMLNodeInfo> hashed = new HashMap<>();
         hashed.put("position", getPosition().hashed());
         hashed.put("velocity", getVelocity().hashed());
+        hashed.put("show", new XMLNodeInfo(String.valueOf(trail.isShowing())));
         return new XMLNodeInfo(hashed);
     }
 
@@ -133,7 +136,8 @@ public class OrbitalPath implements XMLHashable {
             Map<String, XMLNodeInfo> hashed = info.getDataTable();
             Vector2D position = Vector2D.fromXML(hashed.get("position"));
             Vector2D velocity = Vector2D.fromXML(hashed.get("velocity"));
-            return new OrbitalPath(position, velocity);
+            boolean showing = Boolean.parseBoolean(hashed.get("show").getValue());
+            return new OrbitalPath(position, velocity, showing);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }

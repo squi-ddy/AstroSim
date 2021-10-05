@@ -14,6 +14,7 @@
                         <x>0.0</x>
                         <y>0.0</y>
                     </velocity>
+                    <show>false</show>
                 </path>
                 <static>true</static>
                 <mass>1.0E18</mass>
@@ -32,6 +33,7 @@
                         <x>0.0</x>
                         <y>0.0</y>
                     </velocity>
+                    <show>false</show>
                 </path>
                 <static>true</static>
                 <mass>1.0E18</mass>
@@ -50,6 +52,7 @@
                         <x>0.0</x>
                         <y>300.0</y>
                     </velocity>
+                    <show>true</show>
                 </path>
                 <static>false</static>
                 <mass>1.0E18</mass>
@@ -68,6 +71,7 @@
                         <x>0.0</x>
                         <y>-300.0</y>
                     </velocity>
+                    <show>true</show>
                 </path>
                 <static>false</static>
                 <mass>1.0E18</mass>

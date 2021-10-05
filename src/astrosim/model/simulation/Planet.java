@@ -33,19 +33,19 @@ public class Planet implements XMLHashable {
     }
 
     @SuppressWarnings("java:S107")
-    public Planet(Vector2D position, Vector2D velocity, double mass, double radius, boolean isStatic, String name, String color, String trailColor) {
+    public Planet(OrbitalPath path, double mass, double radius, boolean isStatic, String name, String color, String trailColor) {
         this.mass = mass;
         this.radius = radius;
         this.isStatic = isStatic;
         this.name = name;
-        this.path = new OrbitalPath(position, velocity);
+        this.path = path;
         this.color = color;
         this.trailColor = trailColor;
         this.path.setPlanet(this);
     }
 
     public Planet() {
-        this(new Vector2D(), new Vector2D(), 1e18, 20, false, "Planet", getRandomColor(), getRandomColor());
+        this(new OrbitalPath(), 1e18, 20, false, "Planet", getRandomColor(), getRandomColor());
     }
 
     public double getMass() {
@@ -103,8 +103,9 @@ public class Planet implements XMLHashable {
         updateListener.run();
     }
 
-    public void setStatic(boolean aStatic) {
-        isStatic = aStatic;
+    public void setStatic(boolean isStatic) {
+        this.isStatic = isStatic;
+        path.getTrail().setShowing(!isStatic);
         updateListener.run();
     }
 
@@ -144,7 +145,7 @@ public class Planet implements XMLHashable {
             OrbitalPath path = OrbitalPath.fromXML(data.get("path"));
             String color = data.get("color").getValue();
             String trailColor = data.get("trailColor").getValue();
-            return new Planet(path.getPosition(), path.getVelocity(), mass, radius, isStatic, name, color, trailColor);
+            return new Planet(path, mass, radius, isStatic, name, color, trailColor);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }

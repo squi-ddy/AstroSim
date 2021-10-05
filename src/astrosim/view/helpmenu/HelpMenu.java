@@ -31,7 +31,7 @@ public class HelpMenu {
                 -Burst Factor: Determine the proportion of the buffer that is filled by each simulation step. Accepts any value above 0.
                 -Sensitivity: Determines the zoom change upon scroll. Accepts any value above 0.
                 -Graphics: Determine how detailed the trails are. 'High' is recommended if you have a GPU.
-                -Draw Trail: Determines if permanent trails are rendered.
+                -Permanent Trails: Determines if permanent trails are rendered.
                 -Dark Mode: Toggles light/dark mode.
                 """;
     }
@@ -59,6 +59,7 @@ public class HelpMenu {
                 -Position: The planet's position.
                 -Velocity: The planet's velocity.
                 -Static: Whether the planet is allowed to move.
+                -Show Trail: Whether this planet is allowed to have a trail.
                 """;
     }
 

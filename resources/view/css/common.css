@@ -344,7 +344,7 @@ The help menu VBoxes
     -fx-border-color: -theme-color-2;
     -fx-border-radius: 5;
     -fx-background-radius: 5;
-    -fx-padding: 10;
+    -fx-padding: 10 10 2 10;
 }
 
 .help-popup > .text-flow > .normal-label,

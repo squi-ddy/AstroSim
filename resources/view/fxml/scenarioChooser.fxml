@@ -23,7 +23,7 @@
                <Insets bottom="5.0" />
             </VBox.margin>
          </ImageView>
-         <Label text="AstroSim 1.0" textFill="WHITE" />
+         <Label text="AstroSim" textFill="WHITE" />
          <Label text="A Gravitational Simulator" textFill="WHITE">
             <font>
                <Font name="System Italic" size="15.0" />

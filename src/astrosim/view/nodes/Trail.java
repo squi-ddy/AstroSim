@@ -154,12 +154,14 @@ public class Trail extends Group {
         if (showingPermanent || !showing) return;
         numPoints++;
         if (isPolyline) {
+            if (!(trailLines.getLast() instanceof Polyline)) clearTrail();
             Polyline line = (Polyline) trailLines.getLast();
             line.getPoints().set(line.getPoints().size() - 2, end.getX());
             line.getPoints().set(line.getPoints().size() - 1, end.getY());
             line.getPoints().addAll(end.getX(), end.getY());
             return;
         }
+        if (!(trailLines.getLast() instanceof Line)) clearTrail();
         Line lastLine = (Line) trailLines.getLast();
         lastLine.setEndX(end.getX());
         lastLine.setEndY(end.getY());
@@ -192,11 +194,13 @@ public class Trail extends Group {
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 1, end.getY());
         if (showingPermanent) return;
         if (isPolyline) {
+            if (!(trailLines.getLast() instanceof Polyline)) clearTrail();
             Polyline line = (Polyline) trailLines.getLast();
             line.getPoints().set(line.getPoints().size() - 2, end.getX());
             line.getPoints().set(line.getPoints().size() - 1, end.getY());
             return;
         }
+        if (!(trailLines.getLast() instanceof Line)) clearTrail();
         Line lastLine = (Line) trailLines.getLast();
         lastLine.setEndX(end.getX());
         lastLine.setEndY(end.getY());
@@ -206,10 +210,12 @@ public class Trail extends Group {
         if (showingPermanent || !showing) return;
         numPoints--;
         if (isPolyline) {
+            if (!(trailLines.getLast() instanceof Polyline)) clearTrail();
             Polyline line = (Polyline) trailLines.getLast();
             line.getPoints().remove(0, 2);
             return;
         }
+        if (!(trailLines.getLast() instanceof Line)) clearTrail();
         Line line = (Line) trailLines.removeFirst();
         trailLength -= new Vector2D(line.getStartX(), line.getStartY()).sub(new Vector2D(line.getEndX(), line.getEndY())).magnitude();
         dynamicTrailWrapper.getChildren().remove(0);
@@ -223,12 +229,14 @@ public class Trail extends Group {
         trailLength = 0;
         numPoints = 1;
         if (isPolyline) {
+            if (!(trailLines.getLast() instanceof Polyline)) clearTrail();
             Polyline line = (Polyline) trailLines.getLast();
             double lastX = line.getPoints().get(line.getPoints().size() - 2);
             double lastY = line.getPoints().get(line.getPoints().size() - 1);
             line.getPoints().clear();
             line.getPoints().addAll(lastX, lastY, lastX, lastY);
         } else {
+            if (!(trailLines.getLast() instanceof Line)) clearTrail();
             Line last = (Line) trailLines.getLast();
             trailLines.clear();
             trailLines.add(new Line(last.getEndX(), last.getEndY(), last.getEndX(), last.getEndY()));

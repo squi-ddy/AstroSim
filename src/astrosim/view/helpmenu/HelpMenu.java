@@ -14,7 +14,7 @@ public class HelpMenu {
         menuItems.add(new MenuItem("Planet Settings", () -> new HelpPopup(root, getPlanetSettingsHelp()).show()));
         menuItems.add(new MenuItem("Scenario Settings", () -> new HelpPopup(root, getScenarioSettingsHelp()).show()));
         menuItems.add(new MenuItem("Global Settings", () -> new HelpPopup(root, getGlobalSettingsHelp()).show()));
-        menuItems.add(new MenuItem("Planets menu", () -> new HelpPopup(root, getSeeObjectsHelp()).show()));
+        menuItems.add(new MenuItem("Planets Menu", () -> new HelpPopup(root, getSeeObjectsHelp()).show()));
         Menu helpMenu = new Menu("Help", menuItems, root);
         menuBar.getChildren().add(helpMenu);
     }

@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <astrosim>
     <saveNames>
-        <elem0>onePlanet.xml</elem0>
-        <elem1>dualOrbit.xml</elem1>
+        <elem0>oneplanet.xml</elem0>
+        <elem1>dualorbit.xml</elem1>
         <elem2>bisection.xml</elem2>
-        <size>3</size>
+        <elem3>fourplanets.xml</elem3>
+        <size>4</size>
     </saveNames>
 </astrosim>

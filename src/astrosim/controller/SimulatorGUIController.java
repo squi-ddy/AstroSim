@@ -218,7 +218,7 @@ public class SimulatorGUIController implements Initializable {
         }
         if (speedLevel != 0) {
             simulator = Executors.newSingleThreadScheduledExecutor();
-            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) (101 - SettingsManager.getGlobalSettings().getAccuracy()) *  300 * burstSteps / speedLevel, TimeUnit.MICROSECONDS);
+            simulator.scheduleAtFixedRate(this::runSimulationGUI, 0, (long) (101 - SettingsManager.getGlobalSettings().getAccuracy()) * 200 * burstSteps / speedLevel, TimeUnit.MICROSECONDS);
         }
         syncSpeedButtons();
     }

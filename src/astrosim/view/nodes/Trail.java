@@ -1,6 +1,6 @@
 package astrosim.view.nodes;
 
-import astrosim.model.math.Vector2D;
+import astrosim.model.math.Vec2;
 import astrosim.model.simulation.OrbitalPath;
 import javafx.scene.Group;
 import javafx.scene.paint.Color;
@@ -56,7 +56,7 @@ public class Trail extends Group {
         return 2;
     }
 
-    public Trail(Vector2D position, OrbitalPath path, boolean showing) {
+    public Trail(Vec2 position, OrbitalPath path, boolean showing) {
         this.showing = showing;
         this.path = path;
         numPoints = 1;
@@ -106,7 +106,7 @@ public class Trail extends Group {
         }
     }
 
-    private void setupTrailLines(Vector2D position) {
+    private void setupTrailLines(Vec2 position) {
         trailLength = 0;
         numPoints = 1;
         trailLines.clear();
@@ -147,7 +147,7 @@ public class Trail extends Group {
         permanentTrail.getPoints().addAll(lastX, lastY, lastX, lastY);
     }
 
-    public void addPointToTrail(Vector2D end) {
+    public void addPointToTrail(Vec2 end) {
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 2, end.getX());
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 1, end.getY());
         permanentTrail.getPoints().addAll(end.getX(), end.getY());
@@ -165,7 +165,7 @@ public class Trail extends Group {
         Line lastLine = (Line) trailLines.getLast();
         lastLine.setEndX(end.getX());
         lastLine.setEndY(end.getY());
-        trailLength += new Vector2D(lastLine.getStartX(), lastLine.getStartY()).sub(new Vector2D(lastLine.getEndX(), lastLine.getEndY())).magnitude();
+        trailLength += new Vec2(lastLine.getStartX(), lastLine.getStartY()).sub(new Vec2(lastLine.getEndX(), lastLine.getEndY())).magnitude();
         Line line = new Line(end.getX(), end.getY(), end.getX(), end.getY());
         line.setStrokeLineCap(StrokeLineCap.BUTT);
         line.setStrokeWidth(10);
@@ -174,7 +174,7 @@ public class Trail extends Group {
         double currTrailLength = 0;
         for (Shape node : trailLines) {
             Line currLine = (Line) node;
-            double extraLength = new Vector2D(currLine.getStartX(), currLine.getStartY()).sub(new Vector2D(currLine.getEndX(), currLine.getEndY())).magnitude();
+            double extraLength = new Vec2(currLine.getStartX(), currLine.getStartY()).sub(new Vec2(currLine.getEndX(), currLine.getEndY())).magnitude();
             if (!stepwise) {
                 currLine.setStroke(new LinearGradient(currLine.getStartX(), currLine.getStartY(), currLine.getEndX(), currLine.getEndY(), false, CycleMethod.NO_CYCLE,
                         new Stop(0, color.deriveColor(1, 1, 1, getTransparency(currTrailLength / trailLength))),
@@ -188,7 +188,7 @@ public class Trail extends Group {
         dynamicTrailWrapper.getChildren().setAll(trailLines);
     }
 
-    public void changePoint(Vector2D end) {
+    public void changePoint(Vec2 end) {
         if (!showing) return;
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 2, end.getX());
         permanentTrail.getPoints().set(permanentTrail.getPoints().size() - 1, end.getY());
@@ -217,7 +217,7 @@ public class Trail extends Group {
         }
         if (!(trailLines.getLast() instanceof Line)) clearTrail();
         Line line = (Line) trailLines.removeFirst();
-        trailLength -= new Vector2D(line.getStartX(), line.getStartY()).sub(new Vector2D(line.getEndX(), line.getEndY())).magnitude();
+        trailLength -= new Vec2(line.getStartX(), line.getStartY()).sub(new Vec2(line.getEndX(), line.getEndY())).magnitude();
         dynamicTrailWrapper.getChildren().remove(0);
     }
 

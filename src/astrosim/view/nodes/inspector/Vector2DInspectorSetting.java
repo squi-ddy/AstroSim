@@ -1,6 +1,6 @@
 package astrosim.view.nodes.inspector;
 
-import astrosim.model.math.Vector2D;
+import astrosim.model.math.Vec2;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
 import javafx.geometry.Pos;
@@ -14,13 +14,13 @@ import javafx.scene.layout.GridPane;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public class Vector2DInspectorSetting extends InspectorSetting<Vector2D> {
+public class Vector2DInspectorSetting extends InspectorSetting<Vec2> {
     // Implements InspectorSetting for Vector2Ds.
     private final GridPane toDisplay;
     private final TextField entryFieldX;
     private final TextField entryFieldY;
 
-    public Vector2DInspectorSetting(String name, Vector2D setting, Consumer<Vector2D> onUpdate, Function<Vector2D, Boolean> isValid) {
+    public Vector2DInspectorSetting(String name, Vec2 setting, Consumer<Vec2> onUpdate, Function<Vec2, Boolean> isValid) {
         super(name, setting, onUpdate, isValid);
         this.entryFieldX = new TextField();
         this.entryFieldY = new TextField();
@@ -69,7 +69,7 @@ public class Vector2DInspectorSetting extends InspectorSetting<Vector2D> {
             try {
                 double x = Double.parseDouble(this.entryFieldX.getText());
                 double y = Double.parseDouble(this.entryFieldY.getText());
-                super.setNewValue(new Vector2D(x, y));
+                super.setNewValue(new Vec2(x, y));
             } catch (NumberFormatException exception) {
                 super.setNewValue(null);
             }

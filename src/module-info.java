@@ -12,4 +12,5 @@ module AstroSim {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.xml;
+    requires org.jetbrains.annotations;
 }

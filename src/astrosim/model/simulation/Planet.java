@@ -1,6 +1,6 @@
 package astrosim.model.simulation;
 
-import astrosim.model.math.Vector2D;
+import astrosim.model.math.Vec2;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
@@ -56,11 +56,11 @@ public class Planet implements XMLHashable {
         return radius;
     }
 
-    public Vector2D getPosition() {
+    public Vec2 getPosition() {
         return path.getPosition();
     }
 
-    public Vector2D getVelocity() {
+    public Vec2 getVelocity() {
         return path.getVelocity();
     }
 
@@ -93,7 +93,7 @@ public class Planet implements XMLHashable {
         updateListener.run();
     }
 
-    public void setPosition(Vector2D position, Vector2D velocity) {
+    public void setPosition(Vec2 position, Vec2 velocity) {
         path.setPosition(position, velocity);
         updateListener.run();
     }

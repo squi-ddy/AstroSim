@@ -18,7 +18,7 @@
                 <static>false</static>
                 <color>#b78d11</color>
                 <mass>1.0E18</mass>
-                <name>Planet</name>
+                <name>Planet 1</name>
                 <radius>20.0</radius>
                 <trailColor>#a7ea3c</trailColor>
             </elem0>
@@ -37,7 +37,7 @@
                 <static>false</static>
                 <color>#f32c64</color>
                 <mass>1.0E18</mass>
-                <name>Planet</name>
+                <name>Planet 2</name>
                 <radius>20.0</radius>
                 <trailColor>#3afde5</trailColor>
             </elem2>
@@ -56,7 +56,7 @@
                 <static>false</static>
                 <color>#7680f1</color>
                 <mass>1.0E18</mass>
-                <name>Planet</name>
+                <name>Planet 3</name>
                 <radius>20.0</radius>
                 <trailColor>#453ab2</trailColor>
             </elem1>
@@ -76,7 +76,7 @@
                 <static>false</static>
                 <color>#7a398a</color>
                 <mass>1.0E18</mass>
-                <name>Planet</name>
+                <name>Planet 4</name>
                 <radius>20.0</radius>
                 <trailColor>#cce3b6</trailColor>
             </elem3>

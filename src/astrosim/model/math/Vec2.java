@@ -4,37 +4,40 @@ import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
 import javafx.geometry.Point2D;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class Vector2D implements XMLHashable {
+public class Vec2 implements XMLHashable {
     private final double x;
     private final double y;
     private Double magnitude = null;
 
-    public Vector2D() {
+    public Vec2() {
         this(0, 0);
     }
 
-    public Vector2D(double x, double y) {
+    public Vec2(double x, double y) {
         this.x = x;
         this.y = y;
     }
 
-    public Vector2D add(Vector2D v2) {
-        return new Vector2D(x + v2.x, y + v2.y);
+    public Vec2 add(@NotNull Vec2 v2) {
+        return new Vec2(x + v2.x, y + v2.y);
     }
 
-    public Vector2D sub(Vector2D v2) {
-        return new Vector2D(x - v2.x, y - v2.y);
+    public Vec2 sub(@NotNull Vec2 v2) {
+        return new Vec2(x - v2.x, y - v2.y);
     }
 
-    public Vector2D multiply(double c) {
-        return new Vector2D(x * c, y * c);
+    public Vec2 mul(double c) {
+        return new Vec2(x * c, y * c);
     }
 
-    public double dot(Vector2D v2) {
+    public Vec2 div(double c) { return new Vec2(x / c, y / c); }
+
+    public double dot(Vec2 v2) {
         return (x * v2.x + y * v2.y);
     }
 
@@ -45,8 +48,8 @@ public class Vector2D implements XMLHashable {
         return magnitude;
     }
 
-    public Vector2D normalise() {
-        return new Vector2D(x / magnitude(), y / magnitude());
+    public Vec2 normalise() {
+        return new Vec2(x / magnitude(), y / magnitude());
     }
 
     public double getX() {
@@ -69,12 +72,12 @@ public class Vector2D implements XMLHashable {
         return new XMLNodeInfo(hashed);
     }
 
-    public static Vector2D fromXML(XMLNodeInfo info) throws XMLParseException {
+    public static Vec2 fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
             Map<String, XMLNodeInfo> data = info.getDataTable();
             double x = Double.parseDouble(data.get("x").getValue());
             double y = Double.parseDouble(data.get("y").getValue());
-            return new Vector2D(x, y);
+            return new Vec2(x, y);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {
             throw new XMLParseException(XMLParseException.Type.XML_ERROR);
         }
@@ -87,7 +90,7 @@ public class Vector2D implements XMLHashable {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof Vector2D other) {
+        if (o instanceof Vec2 other) {
             return other.getX() == this.x && other.getY() == this.y;
         }
         return false;

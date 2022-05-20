@@ -1,6 +1,6 @@
 package astrosim.model.simulation;
 
-import astrosim.model.math.Vector2D;
+import astrosim.model.math.Vec2;
 import astrosim.model.xml.XMLHashable;
 import astrosim.model.xml.XMLNodeInfo;
 import astrosim.model.xml.XMLParseException;
@@ -15,9 +15,9 @@ import java.util.Map;
 
 public class OrbitalPath implements XMLHashable {
     // Stores tracers.
-    private final Deque<Vector2D> positionBuffer;
-    private final Deque<Vector2D> velocityBuffer;
-    private Pair<Vector2D, Vector2D> lastPosVel;
+    private final Deque<Vec2> positionBuffer;
+    private final Deque<Vec2> velocityBuffer;
+    private Pair<Vec2, Vec2> lastPosVel;
     private static int maxLength = 0;
     private static int maxBufferLength = 0;
     private static int positionGap = 0;
@@ -49,16 +49,16 @@ public class OrbitalPath implements XMLHashable {
         trail.setColor(Color.web(planet.getTrailColor()));
     }
 
-    public OrbitalPath(Vector2D position, Vector2D velocity, boolean showing) {
+    public OrbitalPath(Vec2 position, Vec2 velocity, boolean showing) {
         this.positionBuffer = new ArrayDeque<>();
         this.velocityBuffer = new ArrayDeque<>();
         this.lastPosVel = new Pair<>(position, velocity);
         this.trail = new Trail(position, this, showing);
     }
 
-    public OrbitalPath() {this(new Vector2D(), new Vector2D(), true);}
+    public OrbitalPath() {this(new Vec2(), new Vec2(), true);}
 
-    public void addPosition(Vector2D pos, Vector2D vel) {
+    public void addPosition(Vec2 pos, Vec2 vel) {
         if (positionBuffer.size() < maxBufferLength + pending) {
             positionBuffer.add(pos);
             velocityBuffer.add(vel);
@@ -79,25 +79,25 @@ public class OrbitalPath implements XMLHashable {
         return trail;
     }
 
-    public Vector2D getLatestVelocity() {
+    public Vec2 getLatestVelocity() {
         if (!velocityBuffer.isEmpty()) return velocityBuffer.getLast();
         return getVelocity();
     }
 
-    public Vector2D getLatestPosition() {
+    public Vec2 getLatestPosition() {
         if (!positionBuffer.isEmpty()) return positionBuffer.getLast();
         return getPosition();
     }
 
-    public Vector2D getPosition() {
+    public Vec2 getPosition() {
         return lastPosVel.getKey();
     }
 
-    public Vector2D getVelocity() {
+    public Vec2 getVelocity() {
         return lastPosVel.getValue();
     }
 
-    public void setPosition(Vector2D position, Vector2D velocity) {
+    public void setPosition(Vec2 position, Vec2 velocity) {
         positionBuffer.clear();
         velocityBuffer.clear();
         lastPosVel = new Pair<>(position, velocity);
@@ -109,7 +109,7 @@ public class OrbitalPath implements XMLHashable {
     public void addToTrail(int steps) {
         if (steps > positionBuffer.size()) System.getLogger("Logger").log(System.Logger.Level.WARNING,"Buffer empty!");
         for (int i = 0; i < steps; i++) {
-            if (untilNextAdd == 0) {
+            if (untilNextAdd == 0 && !positionBuffer.isEmpty()) {
                 trail.addPointToTrail(positionBuffer.getFirst());
                 untilNextAdd = positionGap + 1;
             }
@@ -134,8 +134,8 @@ public class OrbitalPath implements XMLHashable {
     public static OrbitalPath fromXML(XMLNodeInfo info) throws XMLParseException {
         try {
             Map<String, XMLNodeInfo> hashed = info.getDataTable();
-            Vector2D position = Vector2D.fromXML(hashed.get("position"));
-            Vector2D velocity = Vector2D.fromXML(hashed.get("velocity"));
+            Vec2 position = Vec2.fromXML(hashed.get("position"));
+            Vec2 velocity = Vec2.fromXML(hashed.get("velocity"));
             boolean showing = Boolean.parseBoolean(hashed.get("show").getValue());
             return new OrbitalPath(position, velocity, showing);
         } catch (XMLParseException | NullPointerException | NumberFormatException e) {

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<astrosim>
+    <scenario>
+        <valG>6.67E-11</valG>
+        <planets>
+            <elem0>
+                <path>
+                    <show>true</show>
+                    <position>
+                        <x>0.0</x>
+                        <y>0.0</y>
+                    </position>
+                    <velocity>
+                        <x>0.0</x>
+                        <y>-100.0</y>
+                    </velocity>
+                </path>
+                <static>false</static>
+                <color>#4b8989</color>
+                <mass>3.0E18</mass>
+                <name>Planet 1</name>
+                <radius>40.0</radius>
+                <trailColor>#c3f9c4</trailColor>
+            </elem0>
+            <elem2>
+                <path>
+                    <show>true</show>
+                    <position>
+                        <x>250.0</x>
+                        <y>-5000.0</y>
+                    </position>
+                    <velocity>
+                        <x>250.0</x>
+                        <y>0.0</y>
+                    </velocity>
+                </path>
+                <static>false</static>
+                <color>#e0f2ba</color>
+                <mass>1.0E15</mass>
+                <name>Planet 3</name>
+                <radius>20.0</radius>
+                <trailColor>#d959e4</trailColor>
+            </elem2>
+            <elem1>
+                <path>
+                    <show>true</show>
+                    <position>
+                        <x>1000.0</x>
+                        <y>0.0</y>
+                    </position>
+                    <velocity>
+                        <x>0.0</x>
+                        <y>300.0</y>
+                    </velocity>
+                </path>
+                <static>false</static>
+                <color>#849ab6</color>
+                <mass>1.0E18</mass>
+                <name>Planet 2</name>
+                <radius>20.0</radius>
+                <trailColor>#8fe51c</trailColor>
+            </elem1>
+            <size>3</size>
+        </planets>
+        <name>Barycenter</name>
+    </scenario>
+</astrosim>

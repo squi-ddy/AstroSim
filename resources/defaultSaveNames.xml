@@ -5,6 +5,7 @@
         <elem1>dualorbit.xml</elem1>
         <elem2>bisection.xml</elem2>
         <elem3>fourplanets.xml</elem3>
-        <size>4</size>
+        <elem4>barycenter.xml</elem4>
+        <size>5</size>
     </saveNames>
 </astrosim>
